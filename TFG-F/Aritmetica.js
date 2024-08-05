@@ -132,12 +132,21 @@ const Aritmetica = () => {
   };
 
   const handleOperation = (text) => {
-    const match = text.match(/(\d+)\s*(menos|más|\+|\-|por|dividido)\s*(\d+)/);
+    // Modificar la expresión regular para capturar múltiples números y operadores
+    const match = text.match(/(\d+)\s*(menos|más|\+|\-|por|dividido)\s*(\d+(\s*(menos|más|\+|\-|por|dividido)\s*\d+)*)/);
     if (match) {
-      const num1 = match[1];
+      // Extraer todos los números y el operador
+      const numbers = [match[1]];
       let operator = match[2];
-      const num2 = match[3];
-
+      const rest = match[3];
+  
+      // Extraer números adicionales del resto de la cadena
+      const additionalMatches = rest.match(/(\d+)/g);
+      if (additionalMatches) {
+        numbers.push(...additionalMatches);
+      }
+  
+      // Convertir el operador a su símbolo correspondiente
       switch (operator) {
         case 'más':
           operator = '+';
@@ -153,40 +162,37 @@ const Aritmetica = () => {
           break;
       }
   
-
-      setOperation({ num1, operator, num2 });
+      // Llamar a setOperation con una lista de números y el operador
+      setOperation({ numbers, operator });
     } else {
       setMessage("Operación no reconocida, intenta de nuevo.");
     }
   };
-
+  
   const renderOperation = (operation) => {
-    const { num1, operator, num2 } = operation;
-
+    const { numbers, operator } = operation;
+  
     // Padding para asegurar que los números estén alineados a la derecha
-    const maxLength = Math.max(num1.length, num2.length);
-    const paddedNum1 = num1.padStart(maxLength, ' ');
-    const paddedNum2 = num2.padStart(maxLength, ' ');
-
+    const maxLength = Math.max(...numbers.map(num => num.length));
+    const paddedNumbers = numbers.map(num => num.padStart(maxLength, ' '));
+  
     return (
       <View style={styles.operationContainer}>
-        <View style={styles.row}>
-        <Text style={styles.operator}>{' '}</Text>
-          {paddedNum1.split('').map((digit, index) => (
-            <Text key={index} style={styles.number}>{digit}</Text>
+      {paddedNumbers.map((paddedNum, index) => (
+        <View key={index} style={styles.row}>
+          <Text style={styles.operator}>
+            {index === paddedNumbers.length - 1 ? operator : ' '}
+          </Text>
+          {paddedNum.split('').map((digit, digitIndex) => (
+            <Text key={digitIndex} style={styles.number}>{digit}</Text>
           ))}
         </View>
-        <View style={styles.row}>
-            <Text style={styles.operator}>{operator}</Text>
-          {paddedNum2.split('').map((digit, index) => (
-            <Text key={index} style={styles.number}>{digit}</Text>
-          ))}
-        </View>
-       
-        <View style={styles.divider} />
-      </View>
-    );
-  };
+      ))}
+      <View style={styles.divider} />
+      
+    </View>
+  );
+};
 
   return (
     <View style={styles.container}>
@@ -246,18 +252,18 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'center',
+    
   },
   number: {
     fontSize: 40,
     fontWeight: 'bold',
     textAlign: 'right',
-    width: 30, // Ajustar según el espacio necesario
+    width:30, // Ajustar según el espacio necesario
     fontFamily: 'massallera',
   },
   operator: {
     fontFamily: 'massallera',
     fontSize: 40,
-   
     textAlign: 'left',
     width: 30, // Ajustar según el espacio necesario
 
