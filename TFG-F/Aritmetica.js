@@ -14,9 +14,13 @@ const loadFonts = () => {
 const Aritmetica = () => {
   const [bienvenida, setBienvenida] = useState("¡Bienvenido a Aritmética!");
   const [navegacion, setNavegacion] = useState("¿Que operación quiere realizar?");
+  const [realizar, setRealizar] = useState("Vamos a realizar la operación");
   const [recording, setRecording] = useState(null);
   const opacity = React.useRef(new Animated.Value(1)).current;
   const [message, setMessage] = useState('');
+  const [accarreo, setAccarreo] = useState([]);
+  const [operacion, setOperacion] = useState(false);
+  const [resultado, setResultado] = useState([]);
   const [operation, setOperation] = useState(null);
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [showBienvenida, setShowBienvenida] = useState(true);
@@ -134,7 +138,9 @@ const Aritmetica = () => {
   const handleOperation = (text) => {
     // Modificar la expresión regular para capturar múltiples números y operadores
     const match = text.match(/(\d+)\s*(menos|más|\+|\-|por|dividido)\s*(\d+(\s*(menos|más|\+|\-|por|dividido)\s*\d+)*)/);
-    if (match) {
+    const matchAccarreo = text.match(/(me llevo|subo) (una|dos)\.?/i);
+    console.log('Texto:',text, 'Match:', match, 'Match Accarreo:', matchAccarreo);
+    if (match && operacion === false) {
       // Extraer todos los números y el operador
       const numbers = [match[1]];
       let operator = match[2];
@@ -145,6 +151,8 @@ const Aritmetica = () => {
       if (additionalMatches) {
         numbers.push(...additionalMatches);
       }
+
+      console.log('Numbers:', numbers);
   
       // Convertir el operador a su símbolo correspondiente
       switch (operator) {
@@ -161,11 +169,128 @@ const Aritmetica = () => {
           operator = '/';
           break;
       }
-  
+      // setAccarreo(prevAccarreo => [' ', ...prevAccarreo]);
       // Llamar a setOperation con una lista de números y el operador
       setOperation({ numbers, operator });
+      setOperacion(true);
+    } else if(operacion === true && match && !matchAccarreo) {
+      
+      const numbers = [match[1]];
+      let operator = match[2];
+      const rest = match[3];
+  
+      // Extraer números adicionales del resto de la cadena
+      const additionalMatches = rest.match(/(\d+)/g);
+      if (additionalMatches) {
+        numbers.push(...additionalMatches);
+      }
+
+      console.log('Numbers:', numbers);
+  
+    }else if (operacion === true && !matchAccarreo) {
+      const numberWords = {
+        'cero': 0,
+        'zero': 0,
+        'uno': 1,
+        'dos': 2,
+        'tres': 3,
+        'cuatro': 4,
+        'cinco': 5,
+        'seis': 6,
+        'siete': 7,
+        'ocho': 8,
+        'nueve': 9,
+        'diez': 10,
+        'once': 11,
+        'doce': 12,
+        'trece': 13,
+        'catorce': 14,
+        'quince': 15,
+        'dieciséis': 16,
+        'diecisiete': 17,
+        'dieciocho': 18,
+        'diecinueve': 19,
+        'veinte': 20,
+        'veintiuno': 21,
+        'veintidós': 22,
+        'veintitrés': 23,
+        'veinticuatro': 24,
+        'veinticinco': 25,
+        'veintiséis': 26,
+        'veintisiete': 27,
+
+      };
+      // setAccarreo(prevAccarreo => [' ', ...prevAccarreo]);
+     
+      // Convertir el texto a minúsculas, eliminar cualquier punto o coma al final y recortar espacios en blanco
+      const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
+      console.log('Texto procesado:', lowerText);
+    
+      // Verificar si el texto es una palabra que representa un número
+      if (numberWords.hasOwnProperty(lowerText)) {
+        let number = numberWords[lowerText];
+        if (number > 10) {
+          number = number % 10;
+        }
+        console.log('Número encontrado:', number);
+        setResultado(prevResultado => [number, ...prevResultado]);
+      } else if (!isNaN(lowerText)) {
+        let number = parseInt(lowerText, 10);
+        if (number > 10) {
+          number = number % 10;
+        }
+        console.log('Número encontrado:', number);
+        setResultado(prevResultado => [number, ...prevResultado]);
+      } else {
+        console.log('Texto no reconocido:', lowerText);
+        setMessage("Operación no reconocida, intenta de nuevo.");
+      }
+    }else if(matchAccarreo){
+      console.log('Texto procesado:', matchAccarreo);
+      const carryNumber = [matchAccarreo[2]];
+      console.log('Número de acarreo:', carryNumber);
+
+      const numberWords = {
+        'cero': 0,
+        'uno': 1,
+        'una': 1,
+        'dos': 2,
+      };
+
+      const lowerText = matchAccarreo[2].toLowerCase().replace(/[.,]$/, '').trim();
+      console.log('Texto procesado:', lowerText);
+      if (numberWords.hasOwnProperty(lowerText)) {
+        const number = numberWords[lowerText];
+        
+        console.log('Número encontrado:', number);
+        setAccarreo(prevAccarreo => [ number ,...prevAccarreo]);
+        console.log('Acarreo:', accarreo);
+      }
+
+      
     } else {
       setMessage("Operación no reconocida, intenta de nuevo.");
+    }
+  };
+
+  const calculateRightPosition = (resultado) => {
+    const partes = String(resultado).split(',').map(part => part.trim());
+  
+    // Encuentra la longitud máxima de las partes
+    const maxLength = Math.max(...partes.map(part => part.length));
+
+    console.log('Partes:', partes);
+    console.log('Longitud máxima:', maxLength);
+
+    switch(maxLength) {
+      case 2:
+        return 45;  // Ajuste para resultados de dos cifras
+      case 3:
+        return 25;  // Ajuste para resultados de tres cifras
+      case 4:
+        return 10;  // Ajuste para resultados de cuatro cifras
+      default:
+        return 0;   // Ajuste predeterminado para otros casos
     }
   };
   
@@ -175,9 +300,17 @@ const Aritmetica = () => {
     // Padding para asegurar que los números estén alineados a la derecha
     const maxLength = Math.max(...numbers.map(num => num.length));
     const paddedNumbers = numbers.map(num => num.padStart(maxLength, ' '));
+    const rightPosition = calculateRightPosition(numbers);
   
     return (
+      
       <View style={styles.operationContainer}>
+      {operacion && (
+        <Animated.Text style={[styles.messageText, { opacity }]}>
+          {realizar}
+        </Animated.Text>
+      )}
+      <Text style={styles.llevada}>{accarreo.join(' ')}</Text>
       {paddedNumbers.map((paddedNum, index) => (
         <View key={index} style={styles.row}>
           <Text style={styles.operator}>
@@ -188,11 +321,16 @@ const Aritmetica = () => {
           ))}
         </View>
       ))}
-      <View style={styles.divider} />
+      <View style={styles.divider} /> 
+     
+
+      <Text style={[styles.result, { right: rightPosition  }]}>
+        {resultado}
+      </Text>
       
     </View>
   );
-};
+  };
 
   return (
     <View style={styles.container}>
@@ -224,6 +362,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
+  messageText: {
+    bottom: 70,
+    paddingBottom: 20,
+    fontSize: 20,
+    fontWeight: '600',
+    fontFamily: 'massallera',
+  },
   text: {
     paddingtop: 10,
     paddingLeft: 20,
@@ -234,6 +379,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'massallera',
   },
+  llevada: {
+    color: 'red',
+    // position: 'absolute', // Eliminado para que los elementos se alineen naturalmente
+    right: 170,           // Eliminado para evitar posición fija
+    bottom: 30,
+    fontSize: 30,
+    fontFamily: 'massallera',
+    flexDirection: 'row-reverse', // Para que los elementos se añadan a la izquierda
+    alignSelf: 'flex-end',        // Para alinearlo a la derecha del contenedor
+  },
   title: {
     top: 20,
     padding: 30,
@@ -242,7 +397,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   micButton: {
-    top: 400,
+    top: 450,
     marginTop: 20,
   },
   operationContainer: {
@@ -256,12 +411,14 @@ const styles = StyleSheet.create({
   },
   number: {
     fontSize: 40,
+    bottom: 30,
     fontWeight: 'bold',
     textAlign: 'right',
     width:30, // Ajustar según el espacio necesario
     fontFamily: 'massallera',
   },
   operator: {
+    bottom: 30,
     fontFamily: 'massallera',
     fontSize: 40,
     textAlign: 'left',
@@ -269,11 +426,22 @@ const styles = StyleSheet.create({
 
   },
   divider: {
+    bottom: 30,
     height: 4,
     paddingleft: 60,
     backgroundColor: 'black',
-    width: 120, // Asegurar que la barra ocupe el espacio correcto
+    width: 150, // Asegurar que la barra ocupe el espacio correcto
     marginVertical: 10,
+  },
+  result: {
+    height: 60,
+    bottom: 30,
+   right: 10,
+    fontSize: 40,
+    fontWeight: 'bold',
+    fontFamily: 'massallera',
+    textAlign: 'right',
+    width: 180, // Asegurar que el resultado ocupe el espacio correcto
   },
 });
 
