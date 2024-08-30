@@ -23,6 +23,7 @@ const Aritmetica = () => {
   const [resultado, setResultado] = useState([]);
   const [resultado2, setResultado2] = useState([]);
   const [resultado3, setResultado3] = useState([]);
+  const [resultado4, setResultado4] = useState([]);
   const [operation, setOperation] = useState(null);
   const [inserciones, setInserciones] = useState({ fila0: 0, fila1: 0, fila2: 0 });
   const [multiplicador, setMultiplicador] = useState([]);
@@ -144,7 +145,7 @@ const Aritmetica = () => {
 
   const handleOperation = (text) => {
     // Modificar la expresión regular para capturar múltiples números y operadores
-    const match = text.match(/(\d+)\s*(menos|más|\+|\-|por|dividido)\s*(\d+(\s*(menos|más|\+|\-|por|dividido)\s*\d+)*)/);
+    const match = text.match(/(\d+)\s*(menos|más|\+|\-|\x|por|dividido)\s*(\d+(\s*(menos|más|\+|\-|por|dividido)\s*\d+)*)/);
     const resultMatch = text.match(/^\s*([\d\smenos-]+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)\s*$/i);
     const resultMult = text.match(/^\s*([\d\s]+)\s*(?:por|x)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*\.?\s*$/i);
     const matchAccarreo = text.match(/(me llevo|subo) (uno|una|dos)\.?/i);
@@ -162,7 +163,7 @@ const Aritmetica = () => {
       if (additionalMatches) {
         numbers.push(...additionalMatches);
       }
-
+      
       console.log('Numbers:', numbers);
   
       // Convertir el operador a su símbolo correspondiente
@@ -184,24 +185,88 @@ const Aritmetica = () => {
           operator = '/';
           break;
       }
+
+      if(operator === 'x'){
+        setMultiplicador(parseInt(numbers[0], 10));
+        setMultiplicando(parseInt(numbers[1], 10));
+      }
       // setAccarreo(prevAccarreo => [' ', ...prevAccarreo]);
       // Llamar a setOperation con una lista de números y el operador
       setOperation({ numbers, operator });
       setOperacion(true);
+    }if(filasCompletas){
+      console.log("Suma de multiplicación");
+      const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
+      console.log('Texto procesado:', lowerText);
+      const regexOperacion = lowerText.match(/^\s*(\d+)\s*(?:\+|mas|más)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*$/i);
+      const regexNumerico = lowerText.match(/^(1[0-8]|[0-9])\.?$/);
+      const regexPalabras = lowerText.match(/^(cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciséis|diecisiete|dieciocho)\.?$/i);
+
+      const numberWords = {
+        'cero': 0,
+        'zero': 0,
+        'uno': 1,
+        'dos': 2,
+        'tres': 3,
+        'cuatro': 4,
+        'cinco': 5,
+        'seis': 6,
+        'siete': 7,
+        'ocho': 8,
+        'nueve': 9,
+        'diez': 10,
+        'once': 11,
+        'doce': 12,
+        'trece': 13,
+        'catorce': 14,
+        'quince': 15,
+        'dieciséis': 16,
+        'diecisiete': 17,
+        'dieciocho': 18,
+      };
+
+      if (numberWords.hasOwnProperty(lowerText)) {
+        let number = numberWords[lowerText];
+        if (number > 10) {
+          number = number % 10;
+        }
+        console.log('Número encontrado:', number);
+        // setResultado4(prevResultado => [number, ...prevResultado]);
+      }
+
+      if(regexOperacion){
+        const expectedResult = regexOperacion[3];
+        console.log('Expresión:',expectedResult);
+
+        if(expectedResult > 10)
+        {
+          let expectedResultMod = expectedResult % 10;
+          setResultado4(prevResultado => [expectedResultMod, ...prevResultado]);
+        }
+        else
+        {
+          setResultado4(prevResultado => [expectedResult, ...prevResultado]);
+        }
+      }else if(regexNumerico){
+        console.log("Numerico");
+      }else if(regexPalabras){
+        console.log("Palabras");
+      }
+
+
+
+
     }else if (operacion === true && resultMult && !matchAccarreo) {
      
-      const expectedResult = parseInt(resultMult[2], 10);
+      const expectedResult = parseInt(resultMult[3], 10);
 
-      console.log('Expresión Mult:', expectedResult, multiplicacion[3]);
+      console.log('Expresión Mult:', expectedResult, multiplicacion[3], multiplicador, multiplicando);
 
       let filasMultiplicacion = [];
       let filaActual = 0;  // Variable para rastrear la fila actual, comenzando en 0
       let numActual = 0;  // Variable para rastrear el número actual en la fila
 
-      setMultiplicador(parseInt(resultMult[1], 10));
-      setMultiplicando(parseInt(resultMult[2], 10));
-      
-      const numFilas = Math.min(parseInt(multiplicacion[3], 10), 3);  // Número de filas, máximo 3
+      const numFilas = multiplicando.toString().length;  // Número de filas, máximo 3
       const numPorFila = multiplicador.toString().length;  // Cantidad de números por fila
 
       console.log("Multiplicador", multiplicador, "Multiplicando", multiplicando, "numFilas", numFilas, "numPorFilas", numPorFila);
@@ -213,18 +278,24 @@ const Aritmetica = () => {
           const numLength = fila.toString().length;  // Longitud del número actual
           numActual ++; // Ajusta numActual según la longitud del número
 
-          console.log("Num a insertar",numActual, numPorFila,inserciones);
+          console.log("Num a insertar", expectedResult, numPorFila-1, inserciones);
 
           // Solo cuando la fila actual esté completa, se moverá al resultado correspondiente
             let rowCompleted = false;
-            if (inserciones.fila0 <= numPorFila && inserciones.fila1 === 0) {
-              if(expectedResult >= 10 && inserciones.fila0 < numPorFila){
+            if (inserciones.fila0 < numPorFila && inserciones.fila1 === 0) {
+              if(expectedResult >= 10 && inserciones.fila0 === numPorFila-1)
+                {
+                  setResultado(prevResultado => [expectedResult, ...prevResultado]);
+                  setInserciones(prevInserciones => ({ ...prevInserciones, fila0: prevInserciones.fila0 + 1 }));
+                  console.log("Fila 0 Mod Final", filasMultiplicacion, resultado);
+                }
+              else if(expectedResult >= 10){
                 let expectedResultMod = expectedResult % 10;
                 setResultado(prevResultado => [expectedResultMod, ...prevResultado]);
                 setInserciones(prevInserciones => ({ ...prevInserciones, fila0: prevInserciones.fila0 + 1 }));
                 console.log("Fila 0 Mod", filasMultiplicacion, resultado);
               }
-              else
+              else 
               {
                 setResultado(prevResultado => [expectedResult, ...prevResultado]);
                 setInserciones(prevInserciones => ({ ...prevInserciones, fila0: prevInserciones.fila0 + 1 }));
@@ -234,13 +305,13 @@ const Aritmetica = () => {
             } else if (inserciones.fila1 < numPorFila && inserciones.fila2 === 0) {
               if(expectedResult >= 10 && inserciones.fila1 < numPorFila){
                 let expectedResultMod = expectedResult % 10;
-                setResultado(prevResultado => [expectedResultMod, ...prevResultado]);
+                setResultado2(prevResultado => [expectedResultMod, ...prevResultado]);
                 setInserciones(prevInserciones => ({ ...prevInserciones, fila1: prevInserciones.fila1 + 1 }));
                 console.log("Fila 1 Mod", filasMultiplicacion, resultado);
               }
               else
               {
-                setResultado(prevResultado => [expectedResult, ...prevResultado]);
+                setResultado2(prevResultado => [expectedResult, ...prevResultado]);
                 setInserciones(prevInserciones => ({ ...prevInserciones, fila1: prevInserciones.fila1 + 1 }));
                 console.log("Fila 1", filasMultiplicacion, resultado);
               }
@@ -248,7 +319,7 @@ const Aritmetica = () => {
             } else if ( inserciones.fila2 < numPorFila) {
               if(expectedResult >= 10 && inserciones.fila2 < numPorFila){
                 let expectedResultMod = expectedResult % 10;
-                setResultado(prevResultado => [expectedResultMod, ...prevResultado]);
+                setResultado3(prevResultado => [expectedResultMod, ...prevResultado]);
                 setInserciones(prevInserciones => ({ ...prevInserciones, fila2: prevInserciones.fila2 + 1 }));
                 console.log("Fila 2 Mod", filasMultiplicacion, resultado);
               }
@@ -262,8 +333,8 @@ const Aritmetica = () => {
             }
             
             const filasCompletas = (inserciones.fila0 === numPorFila) && 
-            (numFilas > 1 ? inserciones.fila1 === numPorFila : true) && 
-            (numFilas > 2 ? inserciones.fila2 === numPorFila : true);
+            (numFilas > 1 ? inserciones.fila1 === numPorFila-1 : true) && 
+            (numFilas > 2 ? inserciones.fila2 === numPorFila-1 : true);
           
             setFilasCompletas(filasCompletas);
       }
@@ -442,6 +513,9 @@ const Aritmetica = () => {
       {filasCompletas && (
             <View style={styles.dividerMult} />
         )}
+      <Text style={[styles.result4, { right: rightPosition  }]}>
+        {resultado4}
+      </Text>
       
     </View>
   );
@@ -478,7 +552,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   messageText: {
-    bottom: 70,
+    bottom: 80,
     paddingBottom: 20,
     fontSize: 20,
     fontWeight: '600',
@@ -505,14 +579,14 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',        // Para alinearlo a la derecha del contenedor
   },
   title: {
-    top: 20,
-    padding: 30,
+    top: 5,
+    padding: 20,
     fontSize: 30,
     fontWeight: '800',
     marginBottom: 20,
   },
   micButton: {
-    top: 450,
+    top: 30,
     marginTop: 20,
   },
   operationContainer: {
@@ -526,7 +600,7 @@ const styles = StyleSheet.create({
   },
   number: {
     fontSize: 40,
-    bottom: 30,
+    bottom:10,
     fontWeight: 'bold',
     textAlign: 'right',
     width:30, // Ajustar según el espacio necesario
@@ -551,7 +625,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   dividerMult: {
-    bottom: 30,
+    bottom: 60,
     height: 4,
     paddingleft: 60,
     backgroundColor: 'black',
@@ -580,8 +654,18 @@ const styles = StyleSheet.create({
   }, 
   result3: {
     height: 60,
-    bottom: 40,
+    bottom: 50,
     marginRight: 140,
+    fontSize: 40,
+    fontWeight: 'bold',
+    fontFamily: 'massallera',
+    textAlign: 'right',
+    width: 180, // Asegurar que el resultado ocupe el espacio correcto
+  },
+  result4: {
+    height: 60,
+    bottom: 20,
+    marginRight: 210,
     fontSize: 40,
     fontWeight: 'bold',
     fontFamily: 'massallera',
