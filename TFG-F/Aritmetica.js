@@ -19,6 +19,9 @@ const Aritmetica = () => {
   const opacity = React.useRef(new Animated.Value(1)).current;
   const [message, setMessage] = useState('');
   const [accarreo, setAccarreo] = useState([]);
+  const [reinicioAcarreo, setreinicioAcarreo] = useState(false);
+  const [reinicioAcarreo2, setreinicioAcarreo2] = useState(false);
+  const [reinicioAcarreo3, setreinicioAcarreo3] = useState(false);
   const [operacion, setOperacion] = useState(false);
   const [resultado, setResultado] = useState([]);
   const [resultado2, setResultado2] = useState([]);
@@ -148,7 +151,10 @@ const Aritmetica = () => {
     const match = text.match(/(\d+)\s*(menos|más|\+|\-|\x|por|dividido)\s*(\d+(\s*(menos|más|\+|\-|por|dividido)\s*\d+)*)/);
     const resultMatch = text.match(/^\s*([\d\smenos-]+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)\s*$/i);
     const resultMult = text.match(/^\s*([\d\s]+)\s*(?:por|x)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*\.?\s*$/i);
-    const matchAccarreo = text.match(/(me llevo|subo) (uno|una|dos)\.?/i);
+    const matchAccarreo = text.match(/(me llevo|subo) (uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\.?/i);
+    const resultAcarreo = text.match(/(?:\d+\s*(?:por|x)\s*\d+\s*,?\s*\d+\s*y\s*(?:uno|una|1|2|3|4|5|6|7|8|9)\s*,?\s*(\d+))|(?:\d+\s*(?:por|x)\s*\d+\s*es\s*\d+\s*y\s*(?:uno|una|1|2|3|4|5|6|7|8|9)\s*es\s*(\d+))/i);
+
+  
     console.log('Texto:',text,'Mult:', resultMult, 'Match:', match,'resultado', resultMatch, 'Match Accarreo:', matchAccarreo);
     if (match && operacion === false) {
       // Extraer todos los números y el operador
@@ -225,6 +231,15 @@ const Aritmetica = () => {
         'dieciocho': 18,
       };
 
+      if(regexOperacion){
+        const result = parseInt(regexOperacion[3], 10);
+
+        console.log('Expresión:', result);
+        setResultado4(prevResultado => [result, ...prevResultado]);
+      }
+      else if (regexNumerico) {
+        setResultado4(prevResultado => [lowerText, ...prevResultado]);
+      }
       if (numberWords.hasOwnProperty(lowerText)) {
         let number = numberWords[lowerText];
         if (number > 10) {
@@ -232,34 +247,32 @@ const Aritmetica = () => {
         }
         console.log('Número encontrado:', number);
         // setResultado4(prevResultado => [number, ...prevResultado]);
-      }
+      
 
-      if(regexOperacion){
-        const expectedResult = regexOperacion[3];
-        console.log('Expresión:',expectedResult);
-
-        if(expectedResult > 10)
+        if(number > 10)
         {
-          let expectedResultMod = expectedResult % 10;
-          setResultado4(prevResultado => [expectedResultMod, ...prevResultado]);
+          let numberMod = number % 10;
+          console.log("Resultado 4 Mod", resultado4)
+          setResultado4(prevResultado => [numberMod, ...prevResultado]);
         }
         else
         {
-          setResultado4(prevResultado => [expectedResult, ...prevResultado]);
+          console.log("Resultado 4", resultado4)
+          setResultado4(prevResultado => [number, ...prevResultado]);
         }
-      }else if(regexNumerico){
-        console.log("Numerico");
-      }else if(regexPalabras){
-        console.log("Palabras");
       }
+      
 
+    
 
-
-
-    }else if (operacion === true && resultMult && !matchAccarreo) {
-     
-      const expectedResult = parseInt(resultMult[3], 10);
-
+    }else if (operacion === true && resultMult && !matchAccarreo || resultAcarreo) {
+     let expectedResult = null;
+      if(resultAcarreo){
+        console.log("Acarreo", resultAcarreo);
+        expectedResult = resultAcarreo[1] ? parseInt(resultAcarreo[1], 10) : parseInt(resultAcarreo[2], 10);
+      }else{
+        expectedResult = parseInt(resultMult[3], 10);
+      }
       console.log('Expresión Mult:', expectedResult, multiplicacion[3], multiplicador, multiplicando);
 
       let filasMultiplicacion = [];
@@ -303,7 +316,13 @@ const Aritmetica = () => {
               }
               
             } else if (inserciones.fila1 < numPorFila && inserciones.fila2 === 0) {
-              if(expectedResult >= 10 && inserciones.fila1 < numPorFila){
+              if(expectedResult >= 10 && inserciones.fila1 === numPorFila-1)
+                {
+                  setResultado2(prevResultado => [expectedResult, ...prevResultado]);
+                  setInserciones(prevInserciones => ({ ...prevInserciones, fila1: prevInserciones.fila1 + 1 }));
+                  console.log("Fila 1 Mod Final", filasMultiplicacion, resultado);
+                }
+              else if(expectedResult >= 10 && inserciones.fila1 < numPorFila){
                 let expectedResultMod = expectedResult % 10;
                 setResultado2(prevResultado => [expectedResultMod, ...prevResultado]);
                 setInserciones(prevInserciones => ({ ...prevInserciones, fila1: prevInserciones.fila1 + 1 }));
@@ -317,7 +336,13 @@ const Aritmetica = () => {
               }
               
             } else if ( inserciones.fila2 < numPorFila) {
-              if(expectedResult >= 10 && inserciones.fila2 < numPorFila){
+              if(expectedResult >= 10 && inserciones.fila2 === numPorFila-1)
+                {
+                  setResultado3(prevResultado => [expectedResult, ...prevResultado]);
+                  setInserciones(prevInserciones => ({ ...prevInserciones, fila2: prevInserciones.fila2 + 1 }));
+                  console.log("Fila 2 Mod Final", filasMultiplicacion, resultado);
+                }
+              else if(expectedResult >= 10 && inserciones.fila2 < numPorFila){
                 let expectedResultMod = expectedResult % 10;
                 setResultado3(prevResultado => [expectedResultMod, ...prevResultado]);
                 setInserciones(prevInserciones => ({ ...prevInserciones, fila2: prevInserciones.fila2 + 1 }));
@@ -325,18 +350,31 @@ const Aritmetica = () => {
               }
               else
               {
-                setResultado(prevResultado => [expectedResult, ...prevResultado]);
+                setResultado3(prevResultado => [expectedResult, ...prevResultado]);
                 setInserciones(prevInserciones => ({ ...prevInserciones, fila2: prevInserciones.fila2 + 1 }));
                 console.log("Fila 2", filasMultiplicacion, resultado);
               }
               
             }
-            
-            const filasCompletas = (inserciones.fila0 === numPorFila) && 
-            (numFilas > 1 ? inserciones.fila1 === numPorFila-1 : true) && 
-            (numFilas > 2 ? inserciones.fila2 === numPorFila-1 : true);
-          
-            setFilasCompletas(filasCompletas);
+
+            console.log("Inserciones", inserciones);
+           
+
+            if(inserciones.fila0 === numPorFila-1 && !reinicioAcarreo){
+              setAccarreo([]);
+              setreinicioAcarreo(true);
+            }else if(inserciones.fila1 === numPorFila-1 && !reinicioAcarreo2){
+              setAccarreo([]);
+              setreinicioAcarreo2(true);
+            }
+            else if(inserciones.fila2 === numPorFila-2 && !reinicioAcarreo3){
+              setAccarreo([]);
+              setreinicioAcarreo3(true);
+            }
+            if(reinicioAcarreo === true && reinicioAcarreo2 === true ){
+              setFilasCompletas(true);
+            }
+            console.log("Reinicios", reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas);
       }
     }
     else if(operacion === true && resultMatch && !matchAccarreo) {
@@ -435,6 +473,13 @@ const Aritmetica = () => {
         'uno': 1,
         'una': 1,
         'dos': 2,
+        'tres': 3,
+        'cuatro': 4,
+        'cinco': 5,
+        'seis': 6,
+        'siete': 7,
+        'ocho': 8,
+        'nueve': 9,
       };
 
       const lowerText = matchAccarreo[2].toLowerCase().replace(/[.,]$/, '').trim();
@@ -572,7 +617,7 @@ const styles = StyleSheet.create({
     color: 'red',
     // position: 'absolute', // Eliminado para que los elementos se alineen naturalmente
     right: 170,           // Eliminado para evitar posición fija
-    bottom: 30,
+    bottom: 0,
     fontSize: 30,
     fontFamily: 'massallera',
     flexDirection: 'row-reverse', // Para que los elementos se añadan a la izquierda
@@ -655,7 +700,7 @@ const styles = StyleSheet.create({
   result3: {
     height: 60,
     bottom: 50,
-    marginRight: 140,
+    marginRight: 120,
     fontSize: 40,
     fontWeight: 'bold',
     fontFamily: 'massallera',
@@ -664,13 +709,12 @@ const styles = StyleSheet.create({
   },
   result4: {
     height: 60,
-    bottom: 20,
-    marginRight: 210,
+    bottom: 60,
     fontSize: 40,
     fontWeight: 'bold',
     fontFamily: 'massallera',
     textAlign: 'right',
-    width: 180, // Asegurar que el resultado ocupe el espacio correcto
+    width: 200, // Asegurar que el resultado ocupe el espacio correcto
   },
 });
 
