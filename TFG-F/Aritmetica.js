@@ -16,26 +16,32 @@ const Aritmetica = () => {
   const [navegacion, setNavegacion] = useState("¿Que operación quiere realizar?");
   const [realizar, setRealizar] = useState("Vamos a realizar la operación");
   const [realizarDiv, setRealizarDiv] = useState("Vamos a realizar la división");
+  // Grabación de audio
   const [recording, setRecording] = useState(null);
   const opacity = React.useRef(new Animated.Value(1)).current;
   const [message, setMessage] = useState('');
+  // Sumas y Restas
   const [accarreo, setAccarreo] = useState([]);
   const [reinicioAcarreo, setreinicioAcarreo] = useState(false);
   const [reinicioAcarreo2, setreinicioAcarreo2] = useState(false);
   const [reinicioAcarreo3, setreinicioAcarreo3] = useState(false);
+  // División
+  const [division, setDivision] = useState([]);
+  const [cociente, setCociente] = useState([]);
+  const [cogerNumero, setcogerNumero] = useState([]);
+  // Multiplicación
   const [operacion, setOperacion] = useState(false);
   const [resultado, setResultado] = useState([]);
   const [resultado2, setResultado2] = useState([]);
   const [resultado3, setResultado3] = useState([]);
   const [resultado4, setResultado4] = useState([]);
   const [operation, setOperation] = useState(null);
-  const [division, setDivision] = useState([]);
-  const [cogerNumero, setcogerNumero] = useState([]);
   const [inserciones, setInserciones] = useState({ fila0: 0, fila1: 0, fila2: 0 });
   const [multiplicador, setMultiplicador] = useState([]);
   const [multiplicando, setMultiplicando] = useState([]);
   const [multiplicacion, setMultiplicacion] = useState([]);
   const [filasCompletas, setFilasCompletas] = useState(false);
+  // Mensajes de bienvenida y navegación
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [showBienvenida, setShowBienvenida] = useState(true);
   const [showNavegacion, setShowNavegacion] = useState(false);
@@ -149,6 +155,10 @@ const Aritmetica = () => {
     }
   };
 
+  const removeDots = (numberStr) => {
+    return numberStr.replace(/\./g, '');
+  };
+
   const handleOperation = (text) => {
     // Modificar la expresión regular para capturar múltiples números y operadores
     const match = text.match(/(\d+)\s*(menos|más|\+|\-|\x|por|dividido)\s*(\d+(\s*(menos|más|\+|\-|por|dividido)\s*\d+)*)/);
@@ -156,7 +166,7 @@ const Aritmetica = () => {
     const resultMult = text.match(/^\s*([\d\s]+)\s*(?:por|x)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*\.?\s*$/i);
     const matchAccarreo = text.match(/(me llevo|subo) (uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\.?/i);
     const resultAcarreo = text.match(/(?:\d+\s*(?:por|x)\s*\d+\s*,?\s*\d+\s*y\s*(?:uno|una|1|2|3|4|5|6|7|8|9)\s*,?\s*(\d+))|(?:\d+\s*(?:por|x)\s*\d+\s*es\s*\d+\s*y\s*(?:uno|una|1|2|3|4|5|6|7|8|9)\s*es\s*(\d+))/i);
-    const div = text.match(/\b(\d+)\s*(entre|dividido\s+entre)\s*(\d+)\b/gi);
+    const div = text.match(/\b(\d{1,3}(?:\.\d{3})*)\s*(entre|dividido\s+entre)\s*(\d{1,3}(?:\.\d{3})*)\b/gi);
     const cogerNumeroMatch = text.match(/(coj[oa]s?|cog[oa]s?|cog[oi][ae]?s?|cog[oi][ae]?|coge|cojo)\s*(uno|un|dos|tres|\d+)/i);
 
     const divisionProc1 = text.match(/(\d+)\s*(por|x)\s*(\d+)\s*(igual\s*a|es|son)?\s*,?\s*(\d+)/i);
@@ -234,13 +244,13 @@ const Aritmetica = () => {
       if(division && division.length === 0){
         // Si hay coincidencias, extraemos los dividendos y divisores
         const resultados = div.map(division => {
-        // Usamos un regex adicional para extraer dividendo y divisor
-        const partes = division.match(/\b(\d+)\s*(entre|dividido\s+entre)\s*(\d+)\b/i);
+          // Usamos un regex adicional para extraer dividendo y divisor
+          const partes = division.match(/\b(\d{1,3}(?:\.\d{3})*)\s*(entre|dividido\s+entre)\s*(\d{1,3}(?:\.\d{3})*)\b/i);
           return {
-            dividendo: partes[1],  // Primer grupo capturado: dividendo
-            divisor: partes[3]     // Tercer grupo capturado: divisor
+            dividendo: removeDots(partes[1]),  // Convertir dividendo eliminando puntos
+            divisor: removeDots(partes[3])     // Convertir divisor eliminando puntos
           };
-      });
+        });
       setDivision(resultados);
       console.log("DIV",division);
     }else{
@@ -563,6 +573,14 @@ const Aritmetica = () => {
         return 0;   // Ajuste predeterminado para otros casos
     }
   };
+
+  const getDividendoStyle = (cogerNumero, dividendoLength) => {
+    if (cogerNumero && dividendoLength) {
+      return `dividendo${dividendoLength}Dig${cogerNumero}`;
+    }
+    return null;
+  };
+
   const renderDivision = (division) => {
     if (!division) {
       console.error("Division is undefined or null");
@@ -590,20 +608,19 @@ const Aritmetica = () => {
           {realizarDiv}
         </Animated.Text>
       )}
-      {dividendo && (
-        <View style={styles.dividendoContainer}>
-          {cogerNumero && cogerNumero === 2 && (
-            <View style={styles.dividendoLine2} />
-          )}
-          {cogerNumero && cogerNumero === 1 && (
-            <View style={styles.dividendoLine} />
-          )}
-          <Text style={styles.dividendoText}>
-            {dividendo}
-          </Text>
-        </View>
-      )}
-      {divisor && (
+
+        {dividendo && (
+      <View style={styles.dividendoContainer}>
+        {cogerNumero && dividendo.length && (
+          <View style={styles[getDividendoStyle(cogerNumero, dividendo.length)]} />
+        )}
+        <Text style={styles.dividendoText}>
+          {dividendo}
+        </Text>
+      </View>
+    )}
+
+        {divisor && (
       <View style={styles.dividerDiv} />
     )}
     {divisor && (
@@ -777,7 +794,7 @@ const styles = StyleSheet.create({
     fontFamily: 'massallera',
     fontSize: 30,
   },
-  dividendoLine2: {
+  dividendo2Dig2: {
     top: 30,
     position: 'absolute',
     width: '10%',
@@ -785,11 +802,59 @@ const styles = StyleSheet.create({
     height: 3, // grosor de la línea
     backgroundColor: 'red', // color de la línea
   },
-  dividendoLine: {
+  dividendo2Dig1: {
     top: 30,
     position: 'absolute',
     width: '5%',
     right: 132,
+    height: 3, // grosor de la línea
+    backgroundColor: 'red', // color de la línea
+  },
+  dividendo3Dig2: {
+    top: 30,
+    position: 'absolute',
+    width: '10%',
+    right: 135,
+    height: 3, // grosor de la línea
+    backgroundColor: 'red', // color de la línea
+  },
+  dividendo3Dig1: {
+    top: 30,
+    position: 'absolute',
+    width: '5%',
+    right: 157,
+    height: 3, // grosor de la línea
+    backgroundColor: 'red', // color de la línea
+  },
+  dividendo4Dig1: {
+    top: 30,
+    position: 'absolute',
+    width: '5%',
+    right: 177,
+    height: 3, // grosor de la línea
+    backgroundColor: 'red', // color de la línea
+  },
+  dividendo4Dig2: {
+    top: 30,
+    position: 'absolute',
+    width: '10%',
+    right: 155,
+    height: 3, // grosor de la línea
+    backgroundColor: 'red', // color de la línea
+  },
+  dividendo5Dig1: {
+    top: 30,
+    position: 'absolute',
+    width: '5%',
+    right: 205,
+    height: 3, // grosor de la línea
+    backgroundColor: 'red', // color de la línea
+  },
+  dividendo5Dig2: {
+    top: 30,
+    position: 'absolute',
+    width: '10%',
+    right: 185,
     height: 3, // grosor de la línea
     backgroundColor: 'red', // color de la línea
   },
