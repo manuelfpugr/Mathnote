@@ -742,14 +742,23 @@ const Aritmetica = () => {
     {procedimientoDivLinea2 && (
             <Text style={[styles.procedimientoDivLinea2, procedimientoDivLinea2.length === 2 && styles.spacing2]}>
               {procedimientoDivLinea2}
+             
             </Text>
           )}
+
+{procedimientoRestar2.length > 0 && (
+       <View style={styles.divBarBajar2} />
+    )}
+
 
     {procedimientoRestar2.length > 0 && (
       <Text style={styles.procedimientoRestar2}>
         {procedimientoRestar2}
+       
       </Text>
     )}
+
+    
     
       </View>
       
@@ -929,7 +938,7 @@ const styles = StyleSheet.create({
   },
   procedimientoDivLinea2:{
     bottom:130,
-    
+    rigth: 100,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -956,7 +965,7 @@ const styles = StyleSheet.create({
   },
   procedimientoRestar2:{
     bottom: 120,
-    right: 100,
+    right: 90,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -969,6 +978,17 @@ const styles = StyleSheet.create({
     width: 50, // Asegurar que la barra ocupe el espacio correcto
 
   },
+
+  
+  divBarBajar2:{
+    bottom:130,
+    height: 4,
+    right:90,
+    backgroundColor: 'black',
+    width: 75, // Asegurar que la barra ocupe el espacio correcto
+
+  },
+
 
   dividendo2Dig2: {
     top: 30,
