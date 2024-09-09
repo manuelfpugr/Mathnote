@@ -11,6 +11,40 @@ const loadFonts = () => {
   });
 };
 
+const numberWords = {
+  'cero': 0,
+  'zero': 0,
+  'un': 1,
+  'uno': 1,
+  'dos': 2,
+  'tres': 3,
+  'cuatro': 4,
+  'cinco': 5,
+  'seis': 6,
+  'siete': 7,
+  'ocho': 8,
+  'nueve': 9,
+  'diez': 10,
+  'once': 11,
+  'doce': 12,
+  'trece': 13,
+  'catorce': 14,
+  'quince': 15,
+  'dieciséis': 16,
+  'diecisiete': 17,
+  'dieciocho': 18,
+  'diecinueve': 19,
+  'veinte': 20,
+  'veintiuno': 21,
+  'veintidós': 22,
+  'veintitrés': 23,
+  'veinticuatro': 24,
+  'veinticinco': 25,
+  'veintiséis': 26,
+  'veintisiete': 27,
+
+};
+
 const Aritmetica = () => {
   const [bienvenida, setBienvenida] = useState("¡Bienvenido a Aritmética!");
   const [navegacion, setNavegacion] = useState("¿Que operación quiere realizar?");
@@ -28,7 +62,13 @@ const Aritmetica = () => {
   // División
   const [division, setDivision] = useState([]);
   const [cociente, setCociente] = useState([]);
+  const [procedimientoDiv, setProcedimientoDiv] = useState([]);
+  const [procedimientoDivLinea2, setProcedimientoDivLinea2] = useState([]);
+  const [procedimientoDivLinea3, setProcedimientoDivLinea3] = useState([]);
   const [cogerNumero, setcogerNumero] = useState([]);
+  const [procedimientoBajar, setProcedimientoBajar] = useState([]);
+  const [procedimientoRestar, setProcedimientoRestar] = useState([]);
+  const [procedimientoRestar2, setProcedimientoRestar2] = useState([]);
   // Multiplicación
   const [operacion, setOperacion] = useState(false);
   const [resultado, setResultado] = useState([]);
@@ -166,13 +206,22 @@ const Aritmetica = () => {
     const resultMult = text.match(/^\s*([\d\s]+)\s*(?:por|x)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*\.?\s*$/i);
     const matchAccarreo = text.match(/(me llevo|subo) (uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\.?/i);
     const resultAcarreo = text.match(/(?:\d+\s*(?:por|x)\s*\d+\s*,?\s*\d+\s*y\s*(?:uno|una|1|2|3|4|5|6|7|8|9)\s*,?\s*(\d+))|(?:\d+\s*(?:por|x)\s*\d+\s*es\s*\d+\s*y\s*(?:uno|una|1|2|3|4|5|6|7|8|9)\s*es\s*(\d+))/i);
+    //Establecer la división
     const div = text.match(/\b(\d{1,3}(?:\.\d{3})*)\s*(entre|dividido\s+entre)\s*(\d{1,3}(?:\.\d{3})*)\b/gi);
     const cogerNumeroMatch = text.match(/(coj[oa]s?|cog[oa]s?|cog[oi][ae]?s?|cog[oi][ae]?|coge|cojo)\s*(uno|un|dos|tres|\d+)/i);
-
+    // Procedimientos para realizar la División
     const divisionProc1 = text.match(/(\d+)\s*(por|x)\s*(\d+)\s*(igual\s*a|es|son)?\s*,?\s*(\d+)/i);
     const divisionProc2 = text.match(/(\d+)\s*(entre|\/|dividido\s*entre)\s*(\d+)\s*(igual\s*a|es|son|,)?\s*(\d+)?/i);
+    const divisionProc3 = text.match(/\bpongo\s(un\s)?((\d|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)(,\s)?)+\b/i);
+    // Procedimientos para bajar números de la división
+    const procedimientoBajar = text.match(/\b(bajo|bajar)\s+(un|el\s+)?(número\s+)?(0|1|2|3|4|5|6|7|8|9|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\b/gi);
+    // Resta de la división
+    const procedimientoResta = text.match(/\b(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(menos|-)\s*(\d+|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(igual\s*a|es|son)?\s*(\d+|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)?\b/gi);    
+    const procedimientoResta2 = text.match(/^\s*(zero|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|0|1|2|3|4|5|6|7|8|9)[.,!?]?\s*$/i);
+    // Decimal División
+    const coma = text.match(/\b(?:coma|añado una coma|pongo una coma|añado una coma después del \d+)\b/gi);
 
-    console.log('Texto:',text,"division 1", divisionProc1, "division 2", divisionProc2);
+    console.log('Texto:',text,"division 1", coma);
     if (match && operacion === false && division.length === 0) {
       // Extraer todos los números y el operador
       const numbers = [match[1]];
@@ -222,12 +271,6 @@ const Aritmetica = () => {
       setOperation({ numbers, operator });
       setOperacion(true);
     }if(cogerNumeroMatch){
-      const numberWords = {
-        'uno': 1,
-        'un': 1,
-        'dos': 2,
-        'tres': 3,
-      };
       
       if (numberWords.hasOwnProperty(cogerNumeroMatch[2])) {
         let number = numberWords[cogerNumeroMatch[2]];
@@ -240,7 +283,7 @@ const Aritmetica = () => {
     }
     
   }
- else if(div || divisionProc1 || divisionProc2){
+ else if(div || divisionProc1 || divisionProc2 || divisionProc3 || procedimientoBajar ||procedimientoResta || procedimientoResta2 ||coma){
       if(division && division.length === 0){
         // Si hay coincidencias, extraemos los dividendos y divisores
         const resultados = div.map(division => {
@@ -253,9 +296,115 @@ const Aritmetica = () => {
         });
       setDivision(resultados);
       console.log("DIV",division);
-    }else{
+    }else if(coma)
+      {
+        console.log("Coma");
+        setCociente(prevResultado => [...prevResultado,","]);
+        setProcedimientoRestar(prevResultado => [...prevResultado, 0]);
+
+      }else if(procedimientoResta || procedimientoResta2){
+      console.log("Resta de la división", procedimientoResta, procedimientoResta2);
+
+      if (procedimientoResta) {
+        // Asegurarse de que procedimientoResta es un array
+        if (Array.isArray(procedimientoResta) && procedimientoResta.length > 0) {
+          const ultimaCoincidencia = procedimientoResta[procedimientoResta.length - 1];
+          const partes = ultimaCoincidencia.match(/\b(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\b/gi);
+          const ultimoNumero = partes[partes.length - 1];
+        
+          // Convertirlo a un número entero (opcional)
+          const ultimoNumeroInt = parseInt(ultimoNumero, 10);
+          console.log("Resta de la división", ultimoNumeroInt);
+        if(procedimientoDivLinea2.length === 0){
+          setProcedimientoRestar(prevResultado => [ultimoNumeroInt, ...prevResultado]);
+        }else{
+          setProcedimientoRestar2(prevResultado => [ultimoNumeroInt, ...prevResultado]);
+        }
+        } else {
+          console.error("procedimientoResta no es un array o está vacío");
+        }
+      }else if(procedimientoResta2){
+        
+          const lowerText = procedimientoResta2[1].toLowerCase().replace(/[.,]$/, '').trim();
+          console.log("Resta de la división 2", lowerText);
+          if (numberWords.hasOwnProperty(lowerText)) {
+            number = numberWords[lowerText];
+            console.log(number);
+          if(procedimientoRestar.length === 0){
+            setProcedimientoRestar(prevResultado => [number, ...prevResultado]);
+            console.log("Añadido ", procedimientoRestar)
+          }else{
+            setProcedimientoRestar2(prevResultado => [number, ...prevResultado]);
+            console.log("Añadido Línea 2 ", procedimientoRestar2)
+          }
+        }else{
+          if(procedimientoRestar.length === 0){
+            setProcedimientoRestar(prevResultado => [procedimientoResta2[1], ...prevResultado]);
+
+        }
+        else{
+          setProcedimientoRestar2(prevResultado => [procedimientoResta2[1], ...prevResultado]);
+        }
+        }
+      }
+
+
+
+
+    }else if(procedimientoBajar){
+      const partes = procedimientoBajar[0].match(/\b(bajo|bajar)\s+(el\s+)?(número\s+)?(0|1|2|3|4|5|6|7|8|9|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\b/i);
+      let number = partes[4];
+      console.log("Activa bajar");
+      if (numberWords.hasOwnProperty(number)) {
+        number = numberWords[number];
+      }
+      console.log("Baja el número", number);
+      setProcedimientoBajar(number);
+    }
+    else{
       console.log("Division Lleno");
       console.log("Procedimiento", divisionProc1, divisionProc2);
+
+      if(divisionProc3)
+      {
+        console.log("Cociente numero 3",divisionProc3[2]);
+        setCociente(prevResultado => [...prevResultado, divisionProc3[2]]);
+      }
+      else if(divisionProc2)
+        {
+          console.log("Cociente numero 2",divisionProc2[2]);
+        }
+        else if(divisionProc1)
+        {
+          if(procedimientoRestar.length === 0){
+          console.log("Cociente numero Mult",divisionProc1[5]);
+
+          if(cociente.length === 0)
+          {
+            setCociente(divisionProc1[3]);
+            setProcedimientoDiv(prevResultado => [divisionProc1[5],...prevResultado]);
+          }
+          else{
+            setProcedimientoDiv(prevResultado => [divisionProc1[5],...prevResultado]);
+          }
+          
+        }
+        else if(procedimientoDivLinea3.length === 0){
+          console.log("ENTRA",cociente.length);
+          if(cociente.includes(',') && cociente.length === 2){
+            console.log("Cociente", cociente.length);
+            setCociente(prevResultado => [...prevResultado,divisionProc1[3]]);
+            console.log("Cociente numero Mult Segunda Linea", divisionProc1[5]);
+            setProcedimientoDivLinea2(prevResultado =>[divisionProc1[5],...prevResultado]);
+          }else if(cociente.length === 1 && !cociente.includes(',')){
+            console.log("Cociente numero Mult Segunda Linea Pr", divisionProc1[5]);
+            setCociente(prevResultado => [...prevResultado,divisionProc1[3]]);
+            setProcedimientoDivLinea2(prevResultado =>[divisionProc1[5],...prevResultado]);
+          }else{
+            setProcedimientoDivLinea2(prevResultado =>[divisionProc1[5],...prevResultado]);
+          }
+      }
+      }
     }
 
     }else if(filasCompletas){
@@ -265,29 +414,6 @@ const Aritmetica = () => {
       const regexOperacion = lowerText.match(/^\s*(\d+)\s*(?:\+|mas|más)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*$/i);
       const regexNumerico = lowerText.match(/^(1[0-8]|[0-9])\.?$/);
       const regexPalabras = lowerText.match(/^(cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciséis|diecisiete|dieciocho)\.?$/i);
-
-      const numberWords = {
-        'cero': 0,
-        'zero': 0,
-        'uno': 1,
-        'dos': 2,
-        'tres': 3,
-        'cuatro': 4,
-        'cinco': 5,
-        'seis': 6,
-        'siete': 7,
-        'ocho': 8,
-        'nueve': 9,
-        'diez': 10,
-        'once': 11,
-        'doce': 12,
-        'trece': 13,
-        'catorce': 14,
-        'quince': 15,
-        'dieciséis': 16,
-        'diecisiete': 17,
-        'dieciocho': 18,
-      };
 
       if(regexOperacion){
         const result = parseInt(regexOperacion[3], 10);
@@ -435,7 +561,7 @@ const Aritmetica = () => {
             console.log("Reinicios", reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas);
       }
     }
-    else if(operacion === true && resultMatch && !matchAccarreo) {
+    else if(operacion === true && resultMatch && !matchAccarreo && division.length === 0) {
       const expression = resultMatch[1].replace(/\s*menos\s*/g, '-');  // Reemplaza 'menos' por '-'
       const expectedResult = parseInt(resultMatch[2], 10);
 
@@ -445,7 +571,7 @@ const Aritmetica = () => {
         setResultado(prevResultado => [expectedResult, ...prevResultado]);
       }
 
-    }else if(operacion === true && match && !matchAccarreo) {
+    }else if(operacion === true && match && !matchAccarreo && division.length) {
       
       const numbers = [match[1]];
       let operator = match[2];
@@ -464,38 +590,7 @@ const Aritmetica = () => {
       console.log('Numbers:', numbers);
   
     }else if (operacion === true && !matchAccarreo) {
-      const numberWords = {
-        'cero': 0,
-        'zero': 0,
-        'uno': 1,
-        'dos': 2,
-        'tres': 3,
-        'cuatro': 4,
-        'cinco': 5,
-        'seis': 6,
-        'siete': 7,
-        'ocho': 8,
-        'nueve': 9,
-        'diez': 10,
-        'once': 11,
-        'doce': 12,
-        'trece': 13,
-        'catorce': 14,
-        'quince': 15,
-        'dieciséis': 16,
-        'diecisiete': 17,
-        'dieciocho': 18,
-        'diecinueve': 19,
-        'veinte': 20,
-        'veintiuno': 21,
-        'veintidós': 22,
-        'veintitrés': 23,
-        'veinticuatro': 24,
-        'veinticinco': 25,
-        'veintiséis': 26,
-        'veintisiete': 27,
-
-      };
+      
       // setAccarreo(prevAccarreo => [' ', ...prevAccarreo]);
      
       // Convertir el texto a minúsculas, eliminar cualquier punto o coma al final y recortar espacios en blanco
@@ -525,21 +620,6 @@ const Aritmetica = () => {
       console.log('Texto procesado:', matchAccarreo);
       const carryNumber = [matchAccarreo[2]];
       console.log('Número de acarreo:', carryNumber);
-
-      const numberWords = {
-        'cero': 0,
-        'uno': 1,
-        'una': 1,
-        'dos': 2,
-        'tres': 3,
-        'cuatro': 4,
-        'cinco': 5,
-        'seis': 6,
-        'siete': 7,
-        'ocho': 8,
-        'nueve': 9,
-      };
-
       const lowerText = matchAccarreo[2].toLowerCase().replace(/[.,]$/, '').trim();
       console.log('Texto procesado:', lowerText);
       if (numberWords.hasOwnProperty(lowerText)) {
@@ -583,7 +663,7 @@ const Aritmetica = () => {
 
   const renderDivision = (division) => {
     if (!division) {
-      console.error("Division is undefined or null");
+      console.log("Division is undefined or null");
       return null;
     }
   
@@ -594,7 +674,7 @@ const Aritmetica = () => {
   
     // Verificar nuevamente si division es undefined después de acceder al primer elemento del array
     if (!division) {
-      console.error("Division is undefined or null after accessing array element");
+      console.log("Division is undefined or null after accessing array element");
       return null;
     }
     // Proporcionar valores predeterminados para dividendo y divisor
@@ -631,6 +711,46 @@ const Aritmetica = () => {
           {divisor}
         </Text>
       )}
+      {cociente && (
+        <Text style={[styles.cocienteText, cociente.length > 1 && styles.spacing]}>
+          {cociente}
+        </Text>
+      )}
+
+    {procedimientoDiv && (
+       <Text style={[styles.procedimientoDiv, procedimientoDiv.length === 2 && styles.spacing]}>
+          {procedimientoDiv}
+        </Text>
+      )}
+     
+
+    {procedimientoBajar && (
+            <Text style={styles.procedimientoBajar}>
+              {procedimientoBajar}   
+            </Text>  
+    )}
+    {procedimientoBajar.length > 0  || procedimientoRestar.length > 0  && (
+      <View style={styles.divBarBajar} />
+    )}
+
+    {procedimientoRestar.length > 0 && (
+      <Text style={[styles.procedimientoRestar, cociente.includes(',') > 0 && styles.spacing2]}>
+        {procedimientoRestar}
+      </Text>
+    )}
+
+    {procedimientoDivLinea2 && (
+            <Text style={[styles.procedimientoDivLinea2, procedimientoDivLinea2.length === 2 && styles.spacing2]}>
+              {procedimientoDivLinea2}
+            </Text>
+          )}
+
+    {procedimientoRestar2.length > 0 && (
+      <Text style={styles.procedimientoRestar2}>
+        {procedimientoRestar2}
+      </Text>
+    )}
+    
       </View>
       
       );
@@ -788,12 +908,68 @@ const styles = StyleSheet.create({
     fontFamily: 'massallera',
     fontSize: 30,
   },
+  cocienteText:{
+    bottom: 60,
+    left: 60, 
+    fontFamily: 'massallera',
+    fontSize: 30,
+  },
   dividendoText:{
     top:35,
+    right: 100,
+    fontWeight: 'bold',
+    fontFamily: 'massallera',
+    fontSize: 30,
+  },
+  procedimientoDiv:{
+    bottom: 110,
+    right: 112,
+    fontFamily: 'massallera',
+    fontSize: 30,
+  },
+  procedimientoDivLinea2:{
+    bottom:130,
+    
+    fontFamily: 'massallera',
+    fontSize: 30,
+  },
+  spacing: {
+    right: 100,
+  },
+  spacing2: {
+    right: 90,
+  },
+
+  procedimientoBajar:{
+      bottom: 155,
+      right: 88,
+      fontFamily: 'massallera',
+      fontSize: 30,
+  },
+
+  procedimientoRestar:{
+    bottom: 120,
+    
     right: 100,
     fontFamily: 'massallera',
     fontSize: 30,
   },
+  procedimientoRestar2:{
+    bottom: 120,
+    right: 100,
+    fontFamily: 'massallera',
+    fontSize: 30,
+  },
+
+  divBarBajar:{
+    bottom:130,
+    height: 4,
+    right:105,
+    backgroundColor: 'black',
+    width: 50, // Asegurar que la barra ocupe el espacio correcto
+
+  },
+
   dividendo2Dig2: {
     top: 30,
     position: 'absolute',
