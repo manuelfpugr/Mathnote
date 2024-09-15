@@ -620,9 +620,20 @@ const Aritmetica = () => {
               setAccarreo([]);
               setreinicioAcarreo3(true);
             }
-            if(reinicioAcarreo === true && reinicioAcarreo2 === true ){
+            
+            if(reinicioAcarreo === true && numFilas === 1){
+              console.log("Para una Fila");
               setFilasCompletas(true);
             }
+            else if(reinicioAcarreo2 === true && numFilas === 2){
+              console.log("Para dos Filas");
+              setFilasCompletas(true);
+            }
+            else if(reinicioAcarreo3 === true && numFilas === 3){
+              console.log("Para tres Filas");
+              setFilasCompletas(true);
+            }
+            
             console.log("Reinicios", reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas);
       }
     }
@@ -1205,7 +1216,7 @@ const styles = StyleSheet.create({
   result3: {
     height: 60,
     bottom: 50,
-    marginRight: 120,
+    marginRight: 140,
     fontSize: 40,
     fontWeight: 'bold',
     fontFamily: 'massallera',
