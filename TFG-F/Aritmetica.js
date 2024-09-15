@@ -224,7 +224,7 @@ const Aritmetica = () => {
     const div = text.match(/\b(\d{1,3}(?:\.\d{3})*|\d+)\s*(entre|dividido\s+entre)\s*(\d{1,3}(?:\.\d{3})*|\d+)\b/i);
     const cogerNumeroMatch = text.match(/(coj[oa]s?|cog[oa]s?|cog[oi][ae]?s?|cog[oi][ae]?|coge|cojo)\s*(uno|un|dos|tres|\d+)/i);
     // Procedimientos para realizar la División
-    const divisionProc1 = text.match(/^\s*(\d+)\s*(por|x)\s*(\d+)\s*(igual\s*a|es|son)?\s*(\d+)\s*$/i);
+    const divisionProc1 = text.match(/^\s*(\d+)\s*(por|x)\s*(\d+)\s*(igual\s*a|es|son)?\s*(\d+)\s*\.\s*$/i);
     const divisionProcAcarreo = text.match(/^\s*(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(por|x|más|menos|dividido|entre)\s*(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(es|son)?\s*(\d+)\s*(más|y)?\s*(uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)?\s*(es|son)?\s*(\d+)?\s*$/i);
     const divisionProc2 = text.match(/(\d+)\s*(entre|\/|dividido\s*entre)\s*(\d+)\s*(igual\s*a|es|son|,)?\s*(\d+)?/i);
     const divisionProc3 = text.match(/\bpongo\s(un\s)?((\d|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)(,\s)?)+\b/i);
@@ -401,7 +401,7 @@ const Aritmetica = () => {
         }
       else if(divisionProcAcarreo || resultAcarreo)
       {
-        
+        let result = 0;
         console.log("ACCAREREO", divisionProcAcarreo, resultAcarreo);
 
         if (divisionProcAcarreo !== null && divisionProcAcarreo !== undefined && divisionProcAcarreo.length > 0) {
@@ -418,9 +418,20 @@ const Aritmetica = () => {
         
             if(results !== primerDigitoDivisor){
               console.log("Primer digito divisor con acarreo", results, primerDigitoDivisor);
-              resultAcarreo[2]= resultAcarreo[2] % 10;
+
+              if(resultAcarreo[2] !== undefined){
+               result = resultAcarreo[2] % 10;
+              } else if(resultAcarreo[1] !== undefined){
+                result= resultAcarreo[1] % 10;
+              }
             }
-            setProcedimientoDiv(prevResultado => [resultAcarreo[2],...prevResultado]);
+            if(procedimientoRestar.length === 0){
+            setProcedimientoDiv(prevResultado => [result,...prevResultado]);
+            }
+            else if(procedimientoDivLinea3.length === 0){
+              setProcedimientoDivLinea2(prevResultado => [result,...prevResultado]);
+
+            }
           }
       }
         else if(divisionProc1)
@@ -802,7 +813,7 @@ const Aritmetica = () => {
     )}
 
     {procedimientoDivLinea2 && (
-            <Text style={[styles.procedimientoDivLinea2, procedimientoDivLinea2.length === 2 && styles.spacing2]}>
+            <Text style={[styles.procedimientoDivLinea2, procedimientoDivLinea2.length === 2 ]}>
               {procedimientoDivLinea2}
              
             </Text>
@@ -937,13 +948,10 @@ const styles = StyleSheet.create({
   },
   llevadaDiv: {
     color: 'red',
-    // position: 'absolute', // Eliminado para que los elementos se alineen naturalmente
-    right:112,           // Eliminado para evitar posición fija
-    bottom: 15,
-    fontSize: 30,
+    right:112,           
+    fontSize: 12,
     fontFamily: 'massallera',
-    flexDirection: 'row-reverse', // Para que los elementos se añadan a la izquierda
-    alignSelf: 'flex-end',        // Para alinearlo a la derecha del contenedor
+           // Para alinearlo a la derecha del contenedor
   },
   title: {
     top: 5,
@@ -1012,8 +1020,8 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   procedimientoDivLinea2:{
-    bottom:130,
-    rigth: 100,
+    top:50,
+    right: 85,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -1021,7 +1029,7 @@ const styles = StyleSheet.create({
     right: 125,
   },
   spacing2: {
-    right: 90,
+    right: 125,
   },
 
   procedimientoBajar:{
@@ -1040,7 +1048,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   procedimientoRestar2:{
-    bottom: 120,
+    top: 50,
     right: 90,
     fontFamily: 'massallera',
     fontSize: 30,
@@ -1057,9 +1065,9 @@ const styles = StyleSheet.create({
   },
 
   divBarBajar2:{
-    bottom:130,
+    top:40,
     height: 4,
-    right:90,
+    right:95,
     backgroundColor: 'black',
     width: 75, // Asegurar que la barra ocupe el espacio correcto
 
