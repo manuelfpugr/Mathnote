@@ -2,49 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Audio } from 'expo-av';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import * as Font from 'expo-font';
+
+import regexUtils from './utils/regexUtils.js';
+import styles from './assets/styles/styles.js';
 import AppLoading from 'expo-app-loading';
-
-const loadFonts = () => {
-  return Font.loadAsync({
-    'massallera': require('./assets/fonts/massallera.ttf'),
-  });
-};
-
-const numberWords = {
-  'cero': 0,
-  'una': 1,
-  'zero': 0,
-  'un': 1,
-  'uno': 1,
-  'dos': 2,
-  'tres': 3,
-  'cuatro': 4,
-  'cinco': 5,
-  'seis': 6,
-  'siete': 7,
-  'ocho': 8,
-  'nueve': 9,
-  'diez': 10,
-  'once': 11,
-  'doce': 12,
-  'trece': 13,
-  'catorce': 14,
-  'quince': 15,
-  'dieciséis': 16,
-  'diecisiete': 17,
-  'dieciocho': 18,
-  'diecinueve': 19,
-  'veinte': 20,
-  'veintiuno': 21,
-  'veintidós': 22,
-  'veintitrés': 23,
-  'veinticuatro': 24,
-  'veinticinco': 25,
-  'veintiséis': 26,
-  'veintisiete': 27,
-
-};
+import { numberWords , loadFonts, extractFirstNumber, removeDots} from './utils/utils.js';
 
 const Aritmetica = () => {
   const [bienvenida, setBienvenida] = useState("¡Bienvenido a Aritmética!");
@@ -164,17 +126,6 @@ const Aritmetica = () => {
     }
   };
 
-  function extractFirstNumber(text) {
-    if (text !== undefined && text !== null) {
-      const match = text.match(/(\d+)\s*(x|por)\s*(\d+)/i);
-      if (match) {
-        return match[1]; // Devuelve el primer número de la multiplicación
-      }
-    }
-    return null;
-  }
-  
-
   const stopRecording = async () => {
     setRecording(undefined);
     setMessage('Recording stopped');
@@ -209,32 +160,28 @@ const Aritmetica = () => {
     }
   };
 
-  const removeDots = (numberStr) => {
-    return numberStr.replace(/\./g, '');
-  };
-
   const handleOperation = (text) => {
     // Modificar la expresión regular para capturar múltiples números y operadores
-    const match = text.match(/(\d+)\s*(menos|más|\+|\-|\x|por|dividido)\s*(\d+(\s*(menos|más|\+|\-|por|dividido)\s*\d+)*)/);
-    const resultMatch = text.match(/^\s*([\d\smenos-]+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)\s*$/i);
-    const resultMult = text.match(/^\s*([\d\s]+)\s*(?:por|x)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*\.?\s*$/i);
-    const matchAccarreo = text.match(/(me llevo|subo) (uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\.?/i);
-    const resultAcarreo = text.match(/(?:\d+\s*(?:por|x)\s*\d+\s*,?\s*\d+\s*y\s*(?:uno|una|1|2|3|4|5|6|7|8|9)\s*,?\s*(\d+))|(?:\d+\s*(?:por|x)\s*\d+\s*es\s*\d+\s*y\s*(?:uno|una|1|2|3|4|5|6|7|8|9)\s*es\s*(\d+))/i);
+    const match = regexUtils.matchMultipleNumbersAndOperators(text);
+    const resultMatch = regexUtils.matchResult(text);
+    const resultMult = regexUtils.matchMultiplicationResult(text);
+    const matchAccarreo = regexUtils.matchAcarreo(text);
+    const resultAcarreo = regexUtils.matchAcarreoResult(text);
     //Establecer la división
-    const div = text.match(/\b(\d{1,3}(?:\.\d{3})*|\d+)\s*(entre|dividido\s+entre)\s*(\d{1,3}(?:\.\d{3})*|\d+)\b/i);
-    const cogerNumeroMatch = text.match(/(coj[oa]s?|cog[oa]s?|cog[oi][ae]?s?|cog[oi][ae]?|coge|cojo)\s*(uno|un|dos|tres|\d+)/i);
+    const div = regexUtils.matchDivision(text);
+    const cogerNumeroMatch = regexUtils.matchNumber(text);
     // Procedimientos para realizar la División
-    const divisionProc1 = text.match(/^\s*(\d+)\s*(por|x)\s*(\d+)\s*(igual\s*a|es|son)?\s*(\d+)\s*\.\s*$/i);
-    const divisionProcAcarreo = text.match(/^\s*(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(por|x|más|menos|dividido|entre)\s*(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(es|son)?\s*(\d+)\s*(más|y)?\s*(uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)?\s*(es|son)?\s*(\d+)?\s*$/i);
-    const divisionProc2 = text.match(/(\d+)\s*(entre|\/|dividido\s*entre)\s*(\d+)\s*(igual\s*a|es|son|,)?\s*(\d+)?/i);
-    const divisionProc3 = text.match(/\bpongo\s(un\s)?((\d|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)(,\s)?)+\b/i);
+    const divisionProc1 = regexUtils.matchDivisionProcedure1(text);
+    const divisionProcAcarreo = regexUtils.matchDivisionProcedureAcarreo(text);
+    const divisionProc2 = regexUtils.matchDivisionProcedure2(text);
+    const divisionProc3 = regexUtils.matchDivisionProcedure3(text);
     // Procedimientos para bajar números de la división
-    const procedimientoBajar = text.match(/\b(bajo|bajar)\s+(un|el\s+)?(número\s+)?(0|1|2|3|4|5|6|7|8|9|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\b/gi);
+    const procedimientoBajar = regexUtils.matchLoweringProcedure(text);    
     // Resta de la división
-    const procedimientoResta = text.match(/\b(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(menos|-)\s*(\d+|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(igual\s*a|es|son)?\s*(\d+|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)?\b/gi);    
-    const procedimientoResta2 = text.match(/^\s*(zero|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|0|1|2|3|4|5|6|7|8|9)[.,!?]?\s*$/i);
+    const procedimientoResta = regexUtils.matchSubtractionProcedure(text);
+    const procedimientoResta2 = regexUtils.matchSubtractionProcedure2(text);    
     // Decimal División
-    const coma = text.match(/\b(?:coma|añado una coma|pongo una coma|añado una coma después del \d+)\b/gi);
+    const coma = regexUtils.matchDecimalComma(text);
 
     console.log('Texto:',text, divisionProcAcarreo, "0", resultAcarreo);
     if (match && operacion === false && division.length === 0) {
@@ -299,346 +246,22 @@ const Aritmetica = () => {
     
   }
  else if(div || divisionProc1 || (division.length > 0 && resultAcarreo) || divisionProcAcarreo || divisionProc2 || divisionProc3 || procedimientoBajar ||procedimientoResta || procedimientoResta2 ||coma){
-  if (division && division.length === 0) {
-    console.log("División", div);
-
-    const divisor = div[3];
-    console.log("Divisor", divisor, divisor.toString()[0]);
-    setPrimerDigitoDivisor(divisor.toString()[0]);
-    // Si hay coincidencias, extraemos los dividendos y divisores
-    const resultados = div.map(division => {
-      // Usamos un regex adicional para extraer dividendo y divisor
-      const partes = division.match(/\b(\d{1,3}(?:\.\d{3})*|\d+)\s*(entre|dividido\s+entre)\s*(\d{1,3}(?:\.\d{3})*|\d+)\b/i);
-      if (partes) {
-        return {
-          dividendo: removeDots(partes[1]),  // Convertir dividendo eliminando puntos
-          divisor: removeDots(partes[3])     // Convertir divisor eliminando puntos
-        };
-      }
-    }).filter(result => result !== null); // Filtrar resultados nulos
-    setDivision(resultados);
-    
-    console.log("DIV", division, primerDigitoDivisor);
-  }else if(coma)
-      {
-        console.log("Coma");
-        setCociente(prevResultado => [...prevResultado,","]);
-        setProcedimientoRestar(prevResultado => [...prevResultado, 0]);
-
-      }else if(procedimientoResta || procedimientoResta2){
-      console.log("Resta de la división", procedimientoResta, procedimientoResta2);
-
-      if (procedimientoResta) {
-        // Asegurarse de que procedimientoResta es un array
-        if (Array.isArray(procedimientoResta) && procedimientoResta.length > 0) {
-          const ultimaCoincidencia = procedimientoResta[procedimientoResta.length - 1];
-          const partes = ultimaCoincidencia.match(/\b(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\b/gi);
-          const ultimoNumero = partes[partes.length - 1];
-        
-          // Convertirlo a un número entero (opcional)
-          const ultimoNumeroInt = parseInt(ultimoNumero, 10);
-          console.log("Resta de la división", ultimoNumeroInt);
-        if(procedimientoDivLinea2.length === 0){
-          setProcedimientoRestar(prevResultado => [ultimoNumeroInt, ...prevResultado]);
-        }else{
-          setProcedimientoRestar2(prevResultado => [ultimoNumeroInt, ...prevResultado]);
-        }
-        } else {
-          console.error("procedimientoResta no es un array o está vacío");
-        }
-      }else if(procedimientoResta2){
-        
-          const lowerText = procedimientoResta2[1].toLowerCase().replace(/[.,]$/, '').trim();
-          console.log("Resta de la división 2", lowerText);
-          if (numberWords.hasOwnProperty(lowerText)) {
-            number = numberWords[lowerText];
-            console.log(number);
-          if(procedimientoRestar.length === 0){
-            setProcedimientoRestar(prevResultado => [number, ...prevResultado]);
-            console.log("Añadido ", procedimientoRestar)
-          }else{
-            setProcedimientoRestar2(prevResultado => [number, ...prevResultado]);
-            console.log("Añadido Línea 2 ", procedimientoRestar2)
-          }
-        }else{
-          if(procedimientoRestar.length === 0){
-            setProcedimientoRestar(prevResultado => [procedimientoResta2[1], ...prevResultado]);
-
-        }
-        else{
-          setProcedimientoRestar2(prevResultado => [procedimientoResta2[1], ...prevResultado]);
-        }
-        }
-      }
-
-
-
-
-    }else if(procedimientoBajar){
-      const partes = procedimientoBajar[0].match(/\b(bajo|bajar)\s+(el\s+)?(número\s+)?(0|1|2|3|4|5|6|7|8|9|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\b/i);
-      let number = partes[4];
-      console.log("Activa bajar");
-      if (numberWords.hasOwnProperty(number)) {
-        number = numberWords[number];
-      }
-      console.log("Baja el número", number);
-      setProcedimientoBajar(number);
-    }
-    else{
-      console.log("Division Lleno");
-      console.log("Procedimiento", divisionProc1, divisionProc2);
-
-      console.log("Primer Dig", primerDigitoDivisor)
-
-      if(divisionProc3)
-      {
-        console.log("Cociente numero 3",divisionProc3[2]);
-        setCociente(prevResultado => [...prevResultado, divisionProc3[2]]);
-      }
-      else if(divisionProc2)
-        {
-          console.log("Cociente numero 2",divisionProc2[2]);
-        }
-      else if(divisionProcAcarreo || resultAcarreo)
-      {
-        let result = 0;
-        console.log("ACCAREREO", divisionProcAcarreo, resultAcarreo);
-
-        if (divisionProcAcarreo !== null && divisionProcAcarreo !== undefined && divisionProcAcarreo.length > 0) {
-          let divisionProcAcarreoDiv = divisionProcAcarreo[0];
-          console.log("Acarreo Div", divisionProcAcarreoDiv);            
-          const results = extractFirstNumber(divisionProcAcarreoDiv)
-          console.log("Primer digito divisor 0/", results[0], primerDigitoDivisor);
-      
-        } else if (resultAcarreo !== null && resultAcarreo !== undefined && resultAcarreo.length > 0) {
-            let resultAcarreoDiv = resultAcarreo[0];
-            console.log("Acarreo Div", resultAcarreoDiv);            
-            const results = extractFirstNumber(resultAcarreoDiv)
-            console.log("Primer digito divisor 1/", results[0], primerDigitoDivisor);
-        
-            if(results !== primerDigitoDivisor){
-              console.log("Primer digito divisor con acarreo", results, primerDigitoDivisor);
-
-              if(resultAcarreo[2] !== undefined){
-               result = resultAcarreo[2] % 10;
-              } else if(resultAcarreo[1] !== undefined){
-                result= resultAcarreo[1] % 10;
-              }
-            }
-            if(procedimientoRestar.length === 0){
-            setProcedimientoDiv(prevResultado => [result,...prevResultado]);
-            }
-            else if(procedimientoDivLinea3.length === 0){
-              setProcedimientoDivLinea2(prevResultado => [result,...prevResultado]);
-
-            }
-          }
-      }
-        else if(divisionProc1)
-        {
-          if(divisionProc1[1] !== primerDigitoDivisor ){
-            console.log("Primer digito divisor", divisionProc1, primerDigitoDivisor);
-            divisionProc1[5] = divisionProc1[5] % 10;
-          }
-
-          if(procedimientoRestar.length === 0){
-          console.log("Cociente numero Mult",divisionProc1[5]);
-
-          if(cociente.length === 0)
-          {
-            setCociente(divisionProc1[3]);
-            setProcedimientoDiv(prevResultado => [divisionProc1[5],...prevResultado]);
-          }
-          else{
-            setProcedimientoDiv(prevResultado => [divisionProc1[5],...prevResultado]);
-          }
-          
-        }
-        else if(procedimientoDivLinea3.length === 0){
-          console.log("ENTRA",cociente.length);
-          if(cociente.includes(',') && cociente.length === 2){
-            console.log("Cociente", cociente.length);
-            setCociente(prevResultado => [...prevResultado,divisionProc1[3]]);
-            console.log("Cociente numero Mult Segunda Linea", divisionProc1[5]);
-            setProcedimientoDivLinea2(prevResultado =>[divisionProc1[5],...prevResultado]);
-          }else if(cociente.length === 1 && !cociente.includes(',')){
-            console.log("Cociente numero Mult Segunda Linea Pr", divisionProc1[5]);
-            setCociente(prevResultado => [...prevResultado,divisionProc1[3]]);
-            setProcedimientoDivLinea2(prevResultado =>[divisionProc1[5],...prevResultado]);
-          }else{
-            setProcedimientoDivLinea2(prevResultado =>[divisionProc1[5],...prevResultado]);
-          }
-      }
-      }
-    }
-
-    }else if(filasCompletas && division.length === 0){
-      console.log("Suma de multiplicación");
-      const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
-      console.log('Texto procesado:', lowerText);
-      const regexOperacion = lowerText.match(/^\s*(\d+)\s*(?:\+|mas|más)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*$/i);
-      const regexNumerico = lowerText.match(/^(1[0-8]|[0-9])\.?$/);
-      const regexPalabras = lowerText.match(/^(cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciséis|diecisiete|dieciocho)\.?$/i);
-
-      if(regexOperacion){
-        const result = parseInt(regexOperacion[3], 10);
-
-        console.log('Expresión:', result);
-        setResultado4(prevResultado => [result, ...prevResultado]);
-      }
-      else if (regexNumerico) {
-        setResultado4(prevResultado => [lowerText, ...prevResultado]);
-      }
-      if (numberWords.hasOwnProperty(lowerText)) {
-        let number = numberWords[lowerText];
-        if (number > 10) {
-          number = number % 10;
-        }
-        console.log('Número encontrado:', number);
-        // setResultado4(prevResultado => [number, ...prevResultado]);
-      
-
-        if(number > 10)
-        {
-          let numberMod = number % 10;
-          console.log("Resultado 4 Mod", resultado4)
-          setResultado4(prevResultado => [numberMod, ...prevResultado]);
-        }
-        else
-        {
-          console.log("Resultado 4", resultado4)
-          setResultado4(prevResultado => [number, ...prevResultado]);
-        }
-      }
-      
-
-    
+      divisionGeneral(division, div, coma, procedimientoResta, procedimientoResta2, procedimientoBajar, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, procedimientoDivLinea3, cociente);
+  }else if(filasCompletas && division.length === 0){
+      sumaMultiplicacion(text);
 
     }else if (operacion === true && division.length === 0 && resultMult && !matchAccarreo || (resultAcarreo && division.length === 0)) {
+      operacionMultiplicacion(resultMult, resultAcarreo, multiplicador, multiplicando, inserciones)
      let expectedResult = null;
       if(resultAcarreo){
-        console.log("Acarreo", resultAcarreo, division.length);
+        console.log("Acarreo", resultAcarreo);
         expectedResult = resultAcarreo[1] ? parseInt(resultAcarreo[1], 10) : parseInt(resultAcarreo[2], 10);
       }else{
         expectedResult = parseInt(resultMult[3], 10);
       }
-      console.log('Expresión Mult:', expectedResult, multiplicacion[3], multiplicador, multiplicando);
-
-      let filasMultiplicacion = [];
-      let filaActual = 0;  // Variable para rastrear la fila actual, comenzando en 0
-      let numActual = 0;  // Variable para rastrear el número actual en la fila
-
-      const numFilas = multiplicando.toString().length;  // Número de filas, máximo 3
-      const numPorFila = multiplicador.toString().length;  // Cantidad de números por fila
-
-      console.log("Multiplicador", multiplicador, "Multiplicando", multiplicando, "numFilas", numFilas, "numPorFilas", numPorFila);
-
-      if (expectedResult !== null && expectedResult !== undefined) {
-          // Aquí asumimos que el usuario inserta el número directamente
-          const fila = expectedResult;  // El número que el usuario inserta
-          filasMultiplicacion.push(fila);
-          const numLength = fila.toString().length;  // Longitud del número actual
-          numActual ++; // Ajusta numActual según la longitud del número
-
-          console.log("Num a insertar", expectedResult, numPorFila-1, inserciones);
-
-          // Solo cuando la fila actual esté completa, se moverá al resultado correspondiente
-            let rowCompleted = false;
-            if (inserciones.fila0 < numPorFila && inserciones.fila1 === 0) {
-              if(expectedResult >= 10 && inserciones.fila0 === numPorFila-1)
-                {
-                  setResultado(prevResultado => [expectedResult, ...prevResultado]);
-                  setInserciones(prevInserciones => ({ ...prevInserciones, fila0: prevInserciones.fila0 + 1 }));
-                  console.log("Fila 0 Mod Final", filasMultiplicacion, resultado);
-                }
-              else if(expectedResult >= 10){
-                let expectedResultMod = expectedResult % 10;
-                setResultado(prevResultado => [expectedResultMod, ...prevResultado]);
-                setInserciones(prevInserciones => ({ ...prevInserciones, fila0: prevInserciones.fila0 + 1 }));
-                console.log("Fila 0 Mod", filasMultiplicacion, resultado);
-              }
-              else 
-              {
-                setResultado(prevResultado => [expectedResult, ...prevResultado]);
-                setInserciones(prevInserciones => ({ ...prevInserciones, fila0: prevInserciones.fila0 + 1 }));
-                console.log("Fila 0", filasMultiplicacion, resultado);
-              }
-              
-            } else if (inserciones.fila1 < numPorFila && inserciones.fila2 === 0) {
-              if(expectedResult >= 10 && inserciones.fila1 === numPorFila-1)
-                {
-                  setResultado2(prevResultado => [expectedResult, ...prevResultado]);
-                  setInserciones(prevInserciones => ({ ...prevInserciones, fila1: prevInserciones.fila1 + 1 }));
-                  console.log("Fila 1 Mod Final", filasMultiplicacion, resultado);
-                }
-              else if(expectedResult >= 10 && inserciones.fila1 < numPorFila){
-                let expectedResultMod = expectedResult % 10;
-                setResultado2(prevResultado => [expectedResultMod, ...prevResultado]);
-                setInserciones(prevInserciones => ({ ...prevInserciones, fila1: prevInserciones.fila1 + 1 }));
-                console.log("Fila 1 Mod", filasMultiplicacion, resultado);
-              }
-              else
-              {
-                setResultado2(prevResultado => [expectedResult, ...prevResultado]);
-                setInserciones(prevInserciones => ({ ...prevInserciones, fila1: prevInserciones.fila1 + 1 }));
-                console.log("Fila 1", filasMultiplicacion, resultado);
-              }
-              
-            } else if ( inserciones.fila2 < numPorFila) {
-              if(expectedResult >= 10 && inserciones.fila2 === numPorFila-1)
-                {
-                  setResultado3(prevResultado => [expectedResult, ...prevResultado]);
-                  setInserciones(prevInserciones => ({ ...prevInserciones, fila2: prevInserciones.fila2 + 1 }));
-                  console.log("Fila 2 Mod Final", filasMultiplicacion, resultado);
-                }
-              else if(expectedResult >= 10 && inserciones.fila2 < numPorFila){
-                let expectedResultMod = expectedResult % 10;
-                setResultado3(prevResultado => [expectedResultMod, ...prevResultado]);
-                setInserciones(prevInserciones => ({ ...prevInserciones, fila2: prevInserciones.fila2 + 1 }));
-                console.log("Fila 2 Mod", filasMultiplicacion, resultado);
-              }
-              else
-              {
-                setResultado3(prevResultado => [expectedResult, ...prevResultado]);
-                setInserciones(prevInserciones => ({ ...prevInserciones, fila2: prevInserciones.fila2 + 1 }));
-                console.log("Fila 2", filasMultiplicacion, resultado);
-              }
-              
-            }
-
-            console.log("Inserciones", inserciones);
-           
-
-            if(inserciones.fila0 === numPorFila-1 && !reinicioAcarreo){
-              setAccarreo([]);
-              setreinicioAcarreo(true);
-            }else if(inserciones.fila1 === numPorFila-1 && !reinicioAcarreo2){
-              setAccarreo([]);
-              setreinicioAcarreo2(true);
-            }
-            else if(inserciones.fila2 === numPorFila-2 && !reinicioAcarreo3){
-              setAccarreo([]);
-              setreinicioAcarreo3(true);
-            }
-            
-            if(reinicioAcarreo === true && numFilas === 1){
-              console.log("Para una Fila");
-              setFilasCompletas(true);
-            }
-            else if(reinicioAcarreo2 === true && numFilas === 2){
-              console.log("Para dos Filas");
-              setFilasCompletas(true);
-            }
-            else if(reinicioAcarreo3 === true && numFilas === 3){
-              console.log("Para tres Filas");
-              setFilasCompletas(true);
-            }
-            
-            console.log("Reinicios", reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas);
-      }
+      procesarMultiplicacion(expectedResult, multiplicador, multiplicando, inserciones, reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas, resultado);
     }
     else if(operacion === true && resultMatch && !matchAccarreo && division.length === 0) {
-      const expression = resultMatch[1].replace(/\s*menos\s*/g, '-');  // Reemplaza 'menos' por '-'
       const expectedResult = parseInt(resultMatch[2], 10);
 
       console.log('Expresión:',expectedResult);
@@ -649,68 +272,13 @@ const Aritmetica = () => {
 
     }else if(operacion === true && match && !matchAccarreo && division.length) {
       
-      const numbers = [match[1]];
-      let operator = match[2];
-      const rest = match[3];
-  
-      // Extraer números adicionales del resto de la cadena
-      const additionalMatchesSum = rest.match(/(\d+)/g);
-      const additionalMatchesRest = rest.match(/(\d-)/g);
-      if (additionalMatchesSum) {
-        numbers.push(...additionalMatchesSum);
-      }
-      else if(additionalMatchesRest){
-        numbers.push(...additionalMatchesRest);
-      }
-
-      console.log('Numbers:', numbers);
+     adicionSumaResta(match);
   
     }else if (operacion === true && !matchAccarreo) {
-      
-      // setAccarreo(prevAccarreo => [' ', ...prevAccarreo]);
-     
-      // Convertir el texto a minúsculas, eliminar cualquier punto o coma al final y recortar espacios en blanco
-      const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
-      console.log('Texto procesado:', lowerText);
-    
-      // Verificar si el texto es una palabra que representa un número
-      if (numberWords.hasOwnProperty(lowerText)) {
-        let number = numberWords[lowerText];
-        if (number > 10) {
-          number = number % 10;
-        }
-        console.log('Número encontrado:', number);
-        setResultado(prevResultado => [number, ...prevResultado]);
-      } else if (!isNaN(lowerText)) {
-        let number = parseInt(lowerText, 10);
-        if (number > 10) {
-          number = number % 10;
-        }
-        console.log('Número encontrado:', number);
-        setResultado(prevResultado => [number, ...prevResultado]);
-      } else {
-        console.log('Texto no reconocido:', lowerText);
-        setMessage("Operación no reconocida, intenta de nuevo.");
-      }
+      operacionSumaResta(text);
     }else if(matchAccarreo){
-      console.log('Texto procesado:', matchAccarreo);
-      const carryNumber = [matchAccarreo[2]];
-      console.log('Número de acarreo:', carryNumber);
-      const lowerText = matchAccarreo[2].toLowerCase().replace(/[.,]$/, '').trim();
-      console.log('Texto procesado:', lowerText);
-      if (numberWords.hasOwnProperty(lowerText)) {
-        const number = numberWords[lowerText];
-        
-        console.log('Número encontrado:', number);
-        if(division.length > 0)
-        {
-          setAccarreoDiv(prevAccarreo => [ number ,...prevAccarreo]);
-        }
-        setAccarreo(prevAccarreo => [ number ,...prevAccarreo]);
-        console.log('Acarreo:', accarreo);
-      }
+      funcionAcarreo(matchAccarreo, division);
 
-      
     } else {
       setMessage("Operación no reconocida, inténtalo de nuevo.");
     }
@@ -740,7 +308,365 @@ const Aritmetica = () => {
     }
     return null;
   };
+  // Función para hacer sumas y restas con más de dos números
+  function adicionSumaResta(match) {
+    const numbers = [match[1]];
+    const rest = match[3];
 
+    // Extraer números adicionales del resto de la cadena
+    const additionalMatchesSum = rest.match(/(\d+)/g);
+    const additionalMatchesRest = rest.match(/(\d-)/g);
+    
+    if (additionalMatchesSum) {
+      numbers.push(...additionalMatchesSum);
+    }
+    else if(additionalMatchesRest){
+      numbers.push(...additionalMatchesRest);
+    }
+
+    console.log('Numbers:', numbers);
+  }
+  // Operacion Suma y Resta
+  function operacionSumaResta(text) {
+      // Convertir el texto a minúsculas, eliminar cualquier punto o coma al final y recortar espacios en blanco
+      const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
+      console.log('Texto procesado:', lowerText);
+    
+      // Verificar si el texto es una palabra que representa un número
+      if (numberWords.hasOwnProperty(lowerText)) {
+        let number = numberWords[lowerText];
+        if (number > 10) {
+          number = number % 10;
+        }
+        console.log('Número encontrado:', number);
+        setResultado(prevResultado => [number, ...prevResultado]);
+      } else if (!isNaN(lowerText)) {
+        let number = parseInt(lowerText, 10);
+        if (number > 10) {
+          number = number % 10;
+        }
+        console.log('Número encontrado:', number);
+        setResultado(prevResultado => [number, ...prevResultado]);
+      } else {
+        console.log('Texto no reconocido:', lowerText);
+        setMessage("Operación no reconocida, intenta de nuevo.");
+      }
+    }
+    // Acarreo
+  function funcionAcarreo(matchAccarreo, division) {
+    console.log('Texto procesado:', matchAccarreo);
+        const carryNumber = [matchAccarreo[2]];
+        console.log('Número de acarreo:', carryNumber);
+        const lowerText = matchAccarreo[2].toLowerCase().replace(/[.,]$/, '').trim();
+        console.log('Texto procesado:', lowerText);
+        if (numberWords.hasOwnProperty(lowerText)) {
+          const number = numberWords[lowerText];
+          
+          console.log('Número encontrado:', number);
+          if(division.length > 0)
+          {
+            setAccarreoDiv(prevAccarreo => [ number ,...prevAccarreo]);
+          }
+          setAccarreo(prevAccarreo => [ number ,...prevAccarreo]);
+          console.log('Acarreo:', accarreo);
+        }
+  }
+  // ---------------------------------------------------------------------------------------------------------------------- //
+  // Métodos para la Multiplicación
+    // Procesado de las filas
+  function procesarFila(fila, numPorFila, expectedResult, filasMultiplicacion, resultado) {
+      if (expectedResult >= 10 && fila === numPorFila - 1) {
+          setResultado(prevResultado => [expectedResult, ...prevResultado]);
+          setInserciones(prevInserciones => ({ ...prevInserciones, [`fila${fila}`]: prevInserciones[`fila${fila}`] + 1 }));
+          console.log(`Fila ${fila} Mod Final`, filasMultiplicacion, resultado);
+      } else if (expectedResult >= 10) {
+          let expectedResultMod = expectedResult % 10;
+          setResultado(prevResultado => [expectedResultMod, ...prevResultado]);
+          setInserciones(prevInserciones => ({ ...prevInserciones, [`fila${fila}`]: prevInserciones[`fila${fila}`] + 1 }));
+          console.log(`Fila ${fila} Mod`, filasMultiplicacion, resultado);
+      } else {
+          setResultado(prevResultado => [expectedResult, ...prevResultado]);
+          setInserciones(prevInserciones => ({ ...prevInserciones, [`fila${fila}`]: prevInserciones[`fila${fila}`] + 1 }));
+          console.log(`Fila ${fila}`, filasMultiplicacion, resultado);
+      }
+  }
+  // Procesado del resto de la multiplicación
+  function procesarMultiplicacion(expectedResult, multiplicador, multiplicando, inserciones, reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas, resultado) {
+    console.log('Expresión Mult:', expectedResult, multiplicador, multiplicando);
+
+    let filasMultiplicacion = [];
+    let filaActual = 0;  // Variable para rastrear la fila actual, comenzando en 0
+    let numActual = 0;  // Variable para rastrear el número actual en la fila
+
+    const numFilas = multiplicando.toString().length;  // Número de filas, máximo 3
+    const numPorFila = multiplicador.toString().length;  // Cantidad de números por fila
+
+    console.log("Multiplicador", multiplicador, "Multiplicando", multiplicando, "numFilas", numFilas, "numPorFilas", numPorFila);
+
+    if (expectedResult !== null && expectedResult !== undefined) {
+        // Aquí asumimos que el usuario inserta el número directamente
+        const fila = expectedResult;  // El número que el usuario inserta
+        filasMultiplicacion.push(fila);
+        const numLength = fila.toString().length;  // Longitud del número actual
+        numActual++; // Ajusta numActual según la longitud del número
+
+        console.log("Num a insertar", expectedResult, numPorFila - 1, inserciones);
+
+        // Solo cuando la fila actual esté completa, se moverá al resultado correspondiente
+        console.log("Inserciones", inserciones);
+        // Procesado de las filas en la multiplicación
+        if (inserciones.fila0 < numPorFila && inserciones.fila1 === 0) {
+            procesarFila(0, numPorFila, expectedResult, filasMultiplicacion, resultado);
+        } else if (inserciones.fila1 < numPorFila && inserciones.fila2 === 0) {
+            procesarFila(1, numPorFila, expectedResult, filasMultiplicacion, resultado);
+        } else if (inserciones.fila2 < numPorFila) {
+            procesarFila(2, numPorFila, expectedResult, filasMultiplicacion, resultado);
+        }
+
+        if (inserciones.fila0 === numPorFila - 1 && !reinicioAcarreo) {
+            reinicioAcarreo = true;
+        } else if (inserciones.fila1 === numPorFila - 1 && !reinicioAcarreo2) {
+            reinicioAcarreo2 = true;
+        } else if (inserciones.fila2 === numPorFila - 2 && !reinicioAcarreo3) {
+            reinicioAcarreo3 = true;
+        }
+
+        if (reinicioAcarreo === true && numFilas === 1) {
+            console.log("Para una Fila");
+            filasCompletas = true;
+        } else if (reinicioAcarreo2 === true && numFilas === 2) {
+            console.log("Para dos Filas");
+            filasCompletas = true;
+        } else if (reinicioAcarreo3 === true && numFilas === 3) {
+            console.log("Para tres Filas");
+            filasCompletas = true;
+        }
+
+        console.log("Reinicios", reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas);
+    }
+  }
+  // Suma de Multiplicación
+    function sumaMultiplicacion(text) {
+      console.log("Suma de multiplicación");
+          const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
+          console.log('Texto procesado:', lowerText);
+          const regexOperacion = lowerText.match(/^\s*(\d+)\s*(?:\+|mas|más)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*$/i);
+          const regexNumerico = lowerText.match(/^(1[0-8]|[0-9])\.?$/);
+          const regexPalabras = lowerText.match(/^(cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciséis|diecisiete|dieciocho)\.?$/i);
+
+          if(regexOperacion){
+            const result = parseInt(regexOperacion[3], 10);
+
+            console.log('Expresión:', result);
+            setResultado4(prevResultado => [result, ...prevResultado]);
+          }
+          else if (regexNumerico) {
+            setResultado4(prevResultado => [lowerText, ...prevResultado]);
+          }
+          if (numberWords.hasOwnProperty(lowerText)) {
+            let number = numberWords[lowerText];
+            if (number > 10) {
+              number = number % 10;
+            }
+            console.log('Número encontrado:', number);
+            // setResultado4(prevResultado => [number, ...prevResultado]);
+          
+
+            if(number > 10)
+            {
+              let numberMod = number % 10;
+              console.log("Resultado 4 Mod", resultado4)
+              setResultado4(prevResultado => [numberMod, ...prevResultado]);
+            }
+            else
+            {
+              console.log("Resultado 4", resultado4)
+              setResultado4(prevResultado => [number, ...prevResultado]);
+            }
+          }
+    }
+  // ---------------------------------------------------------------------------------------------------------------------- //
+  // Métodos para la división
+    // Función para manejar la división
+    function establecerDivision(div) {
+      if (div && div.length === 0) {
+        console.log("División", div);
+
+        const divisor = div[3];
+        console.log("Divisor", divisor, divisor.toString()[0]);
+        setPrimerDigitoDivisor(divisor.toString()[0]);
+
+        const resultados = div.map(division => {
+          const partes = division.match(/\b(\d{1,3}(?:\.\d{3})*|\d+)\s*(entre|dividido\s+entre)\s*(\d{1,3}(?:\.\d{3})*|\d+)\b/i);
+          if (partes) {
+            return {
+              dividendo: removeDots(partes[1]),
+              divisor: removeDots(partes[3])
+            };
+          }
+        }).filter(result => result !== null);
+
+        setDivision(resultados);
+        console.log("DIV", division, primerDigitoDivisor);
+      }
+    }
+
+    // Función para manejar la resta de la división
+    function handleRestaDivision(procedimientoRestar, procedimientoRestar2) {
+      console.log("Resta de la división", procedimientoResta, procedimientoResta2);
+
+          if (procedimientoResta) {
+            // Asegurarse de que procedimientoResta es un array
+            if (Array.isArray(procedimientoResta) && procedimientoResta.length > 0) {
+              const ultimaCoincidencia = procedimientoResta[procedimientoResta.length - 1];
+              const partes = ultimaCoincidencia.match(/\b(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\b/gi);
+              const ultimoNumero = partes[partes.length - 1];
+            
+              // Convertirlo a un número entero (opcional)
+              const ultimoNumeroInt = parseInt(ultimoNumero, 10);
+              console.log("Resta de la división", ultimoNumeroInt);
+            if(procedimientoDivLinea2.length === 0){
+              setProcedimientoRestar(prevResultado => [ultimoNumeroInt, ...prevResultado]);
+            }else{
+              setProcedimientoRestar2(prevResultado => [ultimoNumeroInt, ...prevResultado]);
+            }
+            } else {
+              console.error("procedimientoResta no es un array o está vacío");
+            }
+          }else if(procedimientoResta2){
+            
+              const lowerText = procedimientoResta2[1].toLowerCase().replace(/[.,]$/, '').trim();
+              console.log("Resta de la división 2", lowerText);
+              if (numberWords.hasOwnProperty(lowerText)) {
+                number = numberWords[lowerText];
+                console.log(number);
+              if(procedimientoRestar.length === 0){
+                setProcedimientoRestar(prevResultado => [number, ...prevResultado]);
+                console.log("Añadido ", procedimientoRestar)
+              }else{
+                setProcedimientoRestar2(prevResultado => [number, ...prevResultado]);
+                console.log("Añadido Línea 2 ", procedimientoRestar2)
+              }
+            }else{
+              if(procedimientoRestar.length === 0){
+                setProcedimientoRestar(prevResultado => [procedimientoResta2[1], ...prevResultado]);
+
+            }
+            else{
+              setProcedimientoRestar2(prevResultado => [procedimientoResta2[1], ...prevResultado]);
+            }
+            }
+          }
+    }
+    // Función para manejar la acción de bajar números en la división
+    function bajarNumeroDivision(procedimientoBajar) {
+      const partes = procedimientoBajar[0].match(/\b(bajo|bajar)\s+(el\s+)?(número\s+)?(0|1|2|3|4|5|6|7|8|9|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\b/i);
+          let number = partes[4];
+          console.log("Activa bajar");
+          if (numberWords.hasOwnProperty(number)) {
+            number = numberWords[number];
+          }
+          console.log("Baja el número", number);
+          setProcedimientoBajar(number);
+    }
+
+    // Función para eliminar puntos y comas de los números en la división
+    function handleComa() {
+      console.log("Coma");
+      setCociente(prevResultado => [...prevResultado, ","]);
+      setProcedimientoRestar(prevResultado => [...prevResultado, 0]);
+    }
+
+    function divisionGeneral(division, div, coma, procedimientoResta, procedimientoResta2, procedimientoBajar, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, procedimientoDivLinea3, cociente) {
+      if (division && division.length === 0) {
+          establecerDivision(div);
+      } else if (coma) {
+          handleComa();
+      } else if (procedimientoResta || procedimientoResta2) {
+          handleRestaDivision(procedimientoResta, procedimientoResta2);
+      } else if (procedimientoBajar) {
+          bajarNumeroDivision(procedimientoBajar);
+      } else {
+          procesarDivision(divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, procedimientoDivLinea3, cociente);
+      }
+    }
+
+    // Función para procesar la división
+    function procesarDivision(divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, procedimientoDivLinea3, cociente) {
+      console.log("Division Lleno");
+      console.log("Procedimiento", divisionProc1, divisionProc2);
+      console.log("Primer Dig", primerDigitoDivisor);
+
+      if (divisionProc3) {
+        console.log("Cociente numero 3", divisionProc3[2]);
+        setCociente(prevResultado => [...prevResultado, divisionProc3[2]]);
+      } else if (divisionProc2) {
+        console.log("Cociente numero 2", divisionProc2[2]);
+      } else if (divisionProcAcarreo || resultAcarreo) {
+        let result = 0;
+        console.log("ACCAREREO", divisionProcAcarreo, resultAcarreo);
+
+        if (divisionProcAcarreo !== null && divisionProcAcarreo !== undefined && divisionProcAcarreo.length > 0) {
+          let divisionProcAcarreoDiv = divisionProcAcarreo[0];
+          console.log("Acarreo Div", divisionProcAcarreoDiv);
+          const results = extractFirstNumber(divisionProcAcarreoDiv);
+          console.log("Primer digito divisor 0/", results[0], primerDigitoDivisor);
+        } else if (resultAcarreo !== null && resultAcarreo !== undefined && resultAcarreo.length > 0) {
+          let resultAcarreoDiv = resultAcarreo[0];
+          console.log("Acarreo Div", resultAcarreoDiv);
+          const results = extractFirstNumber(resultAcarreoDiv);
+          console.log("Primer digito divisor 1/", results[0], primerDigitoDivisor);
+
+          if (results !== primerDigitoDivisor) {
+            console.log("Primer digito divisor con acarreo", results, primerDigitoDivisor);
+
+            if (resultAcarreo[2] !== undefined) {
+              result = resultAcarreo[2] % 10;
+            } else if (resultAcarreo[1] !== undefined) {
+              result = resultAcarreo[1] % 10;
+            }
+          }
+          if (procedimientoRestar.length === 0) {
+            setProcedimientoDiv(prevResultado => [result, ...prevResultado]);
+          } else if (procedimientoDivLinea3.length === 0) {
+            setProcedimientoDivLinea2(prevResultado => [result, ...prevResultado]);
+          }
+        }
+      } else if (divisionProc1) {
+        if (divisionProc1[1] !== primerDigitoDivisor) {
+          console.log("Primer digito divisor", divisionProc1, primerDigitoDivisor);
+          divisionProc1[5] = divisionProc1[5] % 10;
+        }
+
+        if (procedimientoRestar.length === 0) {
+          console.log("Cociente numero Mult", divisionProc1[5]);
+
+          if (cociente.length === 0) {
+            setCociente(divisionProc1[3]);
+            setProcedimientoDiv(prevResultado => [divisionProc1[5], ...prevResultado]);
+          } else {
+            setProcedimientoDiv(prevResultado => [divisionProc1[5], ...prevResultado]);
+          }
+        } else if (procedimientoDivLinea3.length === 0) {
+          console.log("ENTRA", cociente.length);
+          if (cociente.includes(',') && cociente.length === 2) {
+            console.log("Cociente", cociente.length);
+            setCociente(prevResultado => [...prevResultado, divisionProc1[3]]);
+            console.log("Cociente numero Mult Segunda Linea", divisionProc1[5]);
+            setProcedimientoDivLinea2(prevResultado => [divisionProc1[5], ...prevResultado]);
+          } else if (cociente.length === 1 && !cociente.includes(',')) {
+            console.log("Cociente numero Mult Segunda Linea Pr", divisionProc1[5]);
+            setCociente(prevResultado => [...prevResultado, divisionProc1[3]]);
+            setProcedimientoDivLinea2(prevResultado => [divisionProc1[5], ...prevResultado]);
+          } else {
+            setProcedimientoDivLinea2(prevResultado => [divisionProc1[5], ...prevResultado]);
+          }
+        }
+      }
+    }
+
+// ---------------------------------------------------------------------------------------------------------------------- //
+// Renderizado de la división en pantalla
   const renderDivision = (division) => {
     if (!division) {
       console.log("Division is undefined or null");
@@ -848,7 +774,7 @@ const Aritmetica = () => {
       
       );
   };
-  
+// Renderizado de las operaciones de resta multiplicación y suma
   const renderOperation = (operation) => {
     const { numbers, operator } = operation;
   
@@ -923,315 +849,5 @@ const Aritmetica = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-  messageText: {
-    bottom: 80,
-    paddingBottom: 20,
-    fontSize: 20,
-    fontWeight: '600',
-    fontFamily: 'massallera',
-  },
-  text: {
-    paddingtop: 10,
-    paddingLeft: 20,
-    justifyContent: 'center',
-    paddingRight: 20,
-    textAlign: 'justify',
-    fontSize: 20,
-    fontWeight: '600',
-    fontFamily: 'massallera',
-  },
-  llevada: {
-    color: 'red',
-    // position: 'absolute', // Eliminado para que los elementos se alineen naturalmente
-    right: 170,           // Eliminado para evitar posición fija
-    bottom: 0,
-    fontSize: 30,
-    fontFamily: 'massallera',
-    flexDirection: 'row-reverse', // Para que los elementos se añadan a la izquierda
-    alignSelf: 'flex-end',        // Para alinearlo a la derecha del contenedor
-  },
-  llevadaDiv: {
-    color: 'red',
-    right:112,           
-    fontSize: 12,
-    fontFamily: 'massallera',
-           // Para alinearlo a la derecha del contenedor
-  },
-  title: {
-    top: 5,
-    padding: 20,
-    fontSize: 30,
-    fontWeight: '800',
-    marginBottom: 20,
-  },
-  micButton: {
-    top: 30,
-    marginTop: 20,
-  },
-  operationContainer: {
-    alignItems: 'center',
-   
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    
-  },
-  number: {
-    fontSize: 40,
-    bottom:10,
-    fontWeight: 'bold',
-    textAlign: 'right',
-    width:30, // Ajustar según el espacio necesario
-    fontFamily: 'massallera',
-  },
-  operator: {
-    bottom: 30,
-    fontFamily: 'massallera',
-    fontSize: 0,
-    marginRight: 10,
-    fontSize: 30,
-    textAlign: 'left',
-    width: 30, // Ajustar según el espacio necesario
-
-  },
-  divisorText:{
-    top:80,
-    position: 'absolute',
-    left: 190,
-    fontFamily: 'massallera',
-    fontSize: 30,
-  },
-  cocienteText:{
-    top:60,
-    postion: 'absolute',
-    left: 40, 
-    fontFamily: 'massallera',
-    fontSize: 30,
-  },
-  dividendoText:{
-    top:35,
-    position: 'absolute',
-    right: 70,
-    fontWeight: 'bold',
-    fontFamily: 'massallera',
-    fontSize: 30,
-  },
-  procedimientoDiv:{
-    top: 15,
-    right: 100,
-    fontFamily: 'massallera',
-    fontSize: 30,
-  },
-  procedimientoDivLinea2:{
-    top:50,
-    right: 85,
-    fontFamily: 'massallera',
-    fontSize: 30,
-  },
-  spacing: {
-    right: 125,
-  },
-  spacing2: {
-    right: 125,
-  },
-
-  procedimientoBajar:{
-      top: 165,
-      position: 'absolute',
-      left: 80,
-      fontFamily: 'massallera',
-      fontSize: 30,
-  },
-
-  procedimientoRestar:{
-    top: 165,
-    position: 'absolute',
-    left: 40,
-    fontFamily: 'massallera',
-    fontSize: 30,
-  },
-  procedimientoRestar2:{
-    top: 50,
-    right: 90,
-    fontFamily: 'massallera',
-    fontSize: 30,
-  },
-
-  divBarBajar:{
-    bottom:10,
-    height: 4,
-    position: 'absolute',
-    right:105,
-    backgroundColor: 'black',
-    width: 50, // Asegurar que la barra ocupe el espacio correcto
-
-  },
-
-  divBarBajar2:{
-    top:40,
-    height: 4,
-    right:95,
-    backgroundColor: 'black',
-    width: 75, // Asegurar que la barra ocupe el espacio correcto
-
-  },
-
-
-  dividendo2Dig2: {
-    top: 30,
-    position: 'absolute',
-    width: '10%',
-    right: 85,
-    height: 3, // grosor de la línea
-    backgroundColor: 'red', // color de la línea
-  },
-  dividendo2Dig1: {
-    top: 30,
-    position: 'absolute',
-    width: '5%',
-    right: 97,
-    height: 3, // grosor de la línea
-    backgroundColor: 'red', // color de la línea
-  },
-  dividendo3Dig2: {
-    top: 30,
-    position: 'absolute',
-    width: '10%',
-    right: 100,
-    height: 3, // grosor de la línea
-    backgroundColor: 'red', // color de la línea
-  },
-  dividendo3Dig1: {
-    top: 30,
-    position: 'absolute',
-    width: '5%',
-    right: 125,
-    height: 3, // grosor de la línea
-    backgroundColor: 'red', // color de la línea
-  },
-  dividendo4Dig1: {
-    top: 30,
-    position: 'absolute',
-    width: '5%',
-    right: 145,
-    height: 3, // grosor de la línea
-    backgroundColor: 'red', // color de la línea
-  },
-  dividendo4Dig2: {
-    top: 30,
-    position: 'absolute',
-    width: '10%',
-    right: 125,
-    height: 3, // grosor de la línea
-    backgroundColor: 'red', // color de la línea
-  },
-  dividendo4Dig3: {
-    top: 30,
-    position: 'absolute',
-    width: '13%',
-    right: 100,
-    height: 3, // grosor de la línea
-    backgroundColor: 'red', // color de la línea
-  },
-  dividendo5Dig1: {
-    top: 30,
-    position: 'absolute',
-    width: '5%',
-    right: 175,
-    height: 3, // grosor de la línea
-    backgroundColor: 'red', // color de la línea
-  },
-  dividendo5Dig2: {
-    top: 30,
-    position: 'absolute',
-    width: '10%',
-    right: 166,
-    height: 3, // grosor de la línea
-    backgroundColor: 'red', // color de la línea
-  },
-  dividerDiv: {
-    top: 107,
-    height: 4,
-    position: 'absolute',
-    left: 178,
-    backgroundColor: 'black',
-    width: 120, // Asegurar que la barra ocupe el espacio correcto
-    marginVertical: 10,
-  },
-  divider: {
-    bottom: 30,
-    height: 4,
-    paddingleft: 60,
-    backgroundColor: 'black',
-    width: 150, // Asegurar que la barra ocupe el espacio correcto
-    marginVertical: 10,
-  },
-  dividerMult: {
-    bottom: 60,
-    height: 4,
-    paddingleft: 60,
-    backgroundColor: 'black',
-    width: 150, // Asegurar que la barra ocupe el espacio correcto
-    marginVertical: 10,
-  },
-  dividerDiv2: {
-    transform: 'rotate(90deg)',
-    position: 'absolute',
-    top:84,
-    bottom:12,
-    height: 4,
-    left: 152,
-    backgroundColor: 'black',
-    width: 50, // Asegurar que la barra ocupe el espacio correcto
-    marginVertical: 10,
-  },
-  result: {
-    height: 60,
-    bottom: 30,
-    right: 10,
-    fontSize: 40,
-    fontWeight: 'bold',
-    fontFamily: 'massallera',
-    textAlign: 'right',
-    width: 180, // Asegurar que el resultado ocupe el espacio correcto
-  },
-  result2: {
-    height: 60,
-    bottom: 40,
-    marginRight: 70,
-    fontSize: 40,
-    fontWeight: 'bold',
-    fontFamily: 'massallera',
-    textAlign: 'right',
-    width: 180, // Asegurar que el resultado ocupe el espacio correcto
-  }, 
-  result3: {
-    height: 60,
-    bottom: 50,
-    marginRight: 140,
-    fontSize: 40,
-    fontWeight: 'bold',
-    fontFamily: 'massallera',
-    textAlign: 'right',
-    width: 180, // Asegurar que el resultado ocupe el espacio correcto
-  },
-  result4: {
-    height: 60,
-    bottom: 60,
-    fontSize: 40,
-    fontWeight: 'bold',
-    fontFamily: 'massallera',
-    textAlign: 'right',
-    width: 200, // Asegurar que el resultado ocupe el espacio correcto
-  },
-});
 
 export default Aritmetica;
