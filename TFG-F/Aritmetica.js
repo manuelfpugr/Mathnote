@@ -59,6 +59,11 @@ const Aritmetica = () => {
   const [hasShownBienvenida, setHasShownBienvenida] = useState(false);
   const [hasShownNavegacion, setHasShownNavegacion] = useState(false);
 
+  //Creación de la tabla de operaciones
+  useEffect(() => {
+    createTable();
+  }, []);
+  
   React.useEffect(() => {
     if (!hasShownBienvenida && !hasShownNavegacion) {
       const timer1 = setTimeout(() => {
@@ -600,9 +605,21 @@ const Aritmetica = () => {
 
     // Función para eliminar puntos y comas de los números en la división
     function handleComa() {
-      console.log("Coma");
+      console.log("Coma", cociente.length);
       setCociente(prevResultado => [...prevResultado, ","]);
+      if(cociente.length >= 1 && cociente.length < 2){
+        console.log("Coma a la linea 1");
       setProcedimientoRestar(prevResultado => [...prevResultado, 0]);
+      }else if (cociente.length >= 2 && cociente.length < 3)  {
+        console.log("Coma a la linea 2");
+      setProcedimientoRestar2(prevResultado => [...prevResultado, 0]);
+      }else if (cociente.length >= 3 && cociente.length < 4) {
+      console.log("Coma a la linea 3");
+      setProcedimientoRestar3(prevResultado => [...prevResultado, 0]);
+      }else if (cociente.length >= 4 && cociente.length < 5) {
+        console.log("Coma a la linea 4");
+        setProcedimientoRestar4(prevResultado => [...prevResultado, 0]);
+      }
     }
 
     function divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajar, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, cociente) {
@@ -926,9 +943,22 @@ const Aritmetica = () => {
               dividendo.length == 4 && styles.procedimientoDivLinea4_4Dig,
               dividendo.length == 5 && styles.procedimientoDivLinea4_5Dig,
               ]}>
-              {procedimientoDivLinea3}
+              {procedimientoDivLinea4}
             </Text>
           )}
+
+      {procedimientoRestar4.length > 0 && (
+              <View style={[styles.divBarBajar4, 
+                dividendo.length == 5 && styles.divBarBajar4_5Dig]} />
+            )}
+
+        {procedimientoRestar4.length > 0 && (
+          <Text style={[styles.procedimientoRestar4,  
+          dividendo.length == 5 && styles.procedimientoRestar4_5Dig]}>
+            {procedimientoRestar4}
+          </Text>
+        )}
+
           
 
       </View>
@@ -985,8 +1015,9 @@ const Aritmetica = () => {
     </View>
   );
   };
-
-  return (
+// ---------------------------------------------------------------------------------------------------------------------- //
+  
+return (
     <View style={styles.container}>
     <Text style={[styles.text, styles.title]}>Aritmética</Text>
     {showBienvenida && !hasShownBienvenida && (
