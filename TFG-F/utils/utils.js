@@ -11,6 +11,26 @@ export const extractFirstNumber = (text) => {
     return numberStr.replace(/\./g, '');
   };
 
+  // Función para normalizar números de 5 cifras
+  export const normalizeNumber = (divisionArray) => {
+  // El primer número mantiene los puntos
+  let num1 = divisionArray[1];
+      
+  // Procesar el segundo número, quitando solo los puntos de los miles
+  let num2 = divisionArray[3].replace(/\./g, '');
+  
+  // Si el número NO es múltiplo de 1000, lo dejamos tal cual (ej: 20 se queda como 20)
+  // Si es múltiplo de 1000 y mayor que 1000, lo dividimos por 1000
+  if (parseInt(num2) >= 1000 && parseInt(num2) % 1000 === 0) {
+      num2 = (parseInt(num2) / 1000).toString();
+  }
+  
+  // Formar la cadena con los números procesados
+  let operacionProcesada = `${num1} ${divisionArray[2]} ${num2}`;
+  
+  // Devolver un nuevo array con la cadena procesada y los números originales
+  return [operacionProcesada, num1, divisionArray[2], num2];
+  };
   export const numberWords = {
     'cero': 0,
     'una': 1,
@@ -46,7 +66,7 @@ export const extractFirstNumber = (text) => {
   
   };
 
-    const loadFonts = () => {
+   export const loadFonts = () => {
         return Font.loadAsync({
           'massallera': require('../assets/fonts/massallera.ttf'),
         });
