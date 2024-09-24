@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Audio } from 'expo-av';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { createTables, insertOperation } from './db/database.js';
 
 import regexUtils from './utils/regexUtils.js';
 import styles from './assets/styles/styles.js';
@@ -60,10 +61,11 @@ const Aritmetica = () => {
   const [hasShownNavegacion, setHasShownNavegacion] = useState(false);
 
   //Creación de la tabla de operaciones
-  useEffect(() => {
-    createTable();
+  React.useEffect(() => {
+    createTables(); // Crear tablas al iniciar la app
+   
+
   }, []);
-  
   React.useEffect(() => {
     if (!hasShownBienvenida && !hasShownNavegacion) {
       const timer1 = setTimeout(() => {
