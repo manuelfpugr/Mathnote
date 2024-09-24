@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Audio } from 'expo-av';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { createTables, insertOperation } from './db/database.js';
-
+import { captureAndSaveOperation, getAllOperations} from './db/database.js';
 import regexUtils from './utils/regexUtils.js';
 import styles from './assets/styles/styles.js';
 import AppLoading from 'expo-app-loading';
-import { numberWords , loadFonts, extractFirstNumber, removeDots, normalizeNumber} from './utils/utils.js';
+import ViewShot from 'react-native-view-shot';
+import { numeroConMasDigitos, numberWords , loadFonts, extractFirstNumber, removeDots, normalizeNumber, generateUniqueId} from './utils/utils.js';
 
 const Aritmetica = () => {
+  // Captura de pantalla y db
+  const [lastId, setLastId] = useState(0);
+  const [operations, setOperations] = useState([]);
+  const viewShotRef = useRef(null);
+  const [capturedImage, setCapturedImage] = React.useState(null);
+  // Mensajes de bienvenida y navegación
   const [bienvenida, setBienvenida] = useState("¡Bienvenido a Aritmética!");
   const [navegacion, setNavegacion] = useState("¿Que operación quiere realizar?");
   const [realizar, setRealizar] = useState("Vamos a realizar la operación");
@@ -19,6 +26,10 @@ const Aritmetica = () => {
   const opacity = React.useRef(new Animated.Value(1)).current;
   const [message, setMessage] = useState('');
   // Sumas y Restas
+  const [numeros, setNumeros] = useState([]);
+  const [sumas, setSumas] = useState([]);
+  const [restas, setRestas] = useState([]);
+  const [digitoMayor, setDigitoMayor] = useState(null);
   const [accarreo, setAccarreo] = useState([]);
   const [reinicioAcarreo, setreinicioAcarreo] = useState(false);
   const [reinicioAcarreo2, setreinicioAcarreo2] = useState(false);
@@ -60,11 +71,29 @@ const Aritmetica = () => {
   const [hasShownBienvenida, setHasShownBienvenida] = useState(false);
   const [hasShownNavegacion, setHasShownNavegacion] = useState(false);
 
-  //Creación de la tabla de operaciones
   React.useEffect(() => {
-    createTables(); // Crear tablas al iniciar la app
+    console.log("Hola");
+    const fetchOperations = async () => {
+      const ops = await getAllOperations();
+      setOperations(ops);
+      console.log('Operaciones almacenadas:', ops);
+    };
+
+    fetchOperations();
   }, []);
 
+  React.useEffect(() => {
+    
+    const requestPermissions = async () => {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Se requieren permisos para acceder a la biblioteca de medios.');
+      }
+    };
+    requestPermissions();
+  }, []);
+
+  
 
   React.useEffect(() => {
     if (!hasShownBienvenida && !hasShownNavegacion) {
@@ -176,6 +205,7 @@ const Aritmetica = () => {
   const handleOperation = (text) => {
     // Modificar la expresión regular para capturar múltiples números y operadores
     const match = regexUtils.matchMultipleNumbersAndOperators(text);
+    const multipleSum = regexUtils.matchMultipleSum(text);
     const resultMatch = regexUtils.matchResult(text);
     const resultMult = regexUtils.matchMultiplicationResult(text);
     const matchAccarreo = regexUtils.matchAcarreo(text);
@@ -195,8 +225,10 @@ const Aritmetica = () => {
     const procedimientoResta2 = regexUtils.matchSubtractionProcedure2(text);    
     // Decimal División
     const coma = regexUtils.matchDecimalComma(text);
+    // Captura y guardar operación
+    const guardar = regexUtils.matchGuardarOperacion(text);
 
-    console.log('Texto:',text);
+    console.log('Texto:',text, match);
     if (match && operacion === false && division.length === 0) {
       // Extraer todos los números y el operador
       const numbers = [match[1]];
@@ -209,9 +241,31 @@ const Aritmetica = () => {
       const additionalMatches = rest.match(/(\d+)/g);
       if (additionalMatches) {
         numbers.push(...additionalMatches);
+        setNumeros(numbers);
+        let dig = numeroConMasDigitos(numbers);
+        console.log(numeros);
+        if(dig)
+        {
+          setDigitoMayor(dig);
+          
+        }
+       
       }
+
+      if(match && match[2] === '-' || match[2] === 'menos'){
+        setRestas(numbers);
+        console.log("Restas", restas);
+      }
+      else if(match && match[2] === '+' || match[2] === 'más' || match[2] === 'mas'){
+        setSumas(numbers);
+        console.log("Sumas", sumas);
+        
+      }
+
+
       
-      console.log('Numbers:', numbers);
+      console.log('Numbers 2:', numbers);
+      console.log(digitoMayor);
   
       // Convertir el operador a su símbolo correspondiente
       switch (operator) {
@@ -258,7 +312,7 @@ const Aritmetica = () => {
     }
     
   }
- else if(div || divisionProc1 || (division.length > 0 && resultAcarreo) || resultMult || divisionProcAcarreo || divisionProc2 || divisionProc3 || procedimientoBajarNum || procedimientoResta || procedimientoResta2 ||coma){
+ else if(div && ( divisionProc1 || (division.length > 0 && resultAcarreo) || resultMult || divisionProcAcarreo || divisionProc2 || divisionProc3 || procedimientoBajarNum || procedimientoResta || procedimientoResta2 ||coma) ){
  
   divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajarNum, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, procedimientoDivLinea3, cociente);
   }else if(filasCompletas && division.length === 0){
@@ -283,16 +337,21 @@ const Aritmetica = () => {
         setResultado(prevResultado => [expectedResult, ...prevResultado]);
       }
 
-    }else if(operacion === true && match && !matchAccarreo && division.length) {
+    }else if(operacion === true && match && !matchAccarreo && division.length && !guardar) {
       
      adicionSumaResta(match);
   
-    }else if (operacion === true && !matchAccarreo) {
+    }else if (operacion === true && !matchAccarreo && !guardar) {
       operacionSumaResta(text);
     }else if(matchAccarreo){
       funcionAcarreo(matchAccarreo, division);
 
-    } else {
+    }
+    else if(guardar){
+      console.log('Guardar operación');
+      handleSave();
+    }
+     else if(sumas.length === 0 && division.length === 0 && restas.length === 0 && multiplicacion.length === 0){
       setMessage("Operación no reconocida, inténtalo de nuevo.");
     }
   };
@@ -322,7 +381,7 @@ const Aritmetica = () => {
     return null;
   };
   // Función para hacer sumas y restas con más de dos números
-  function adicionSumaResta(match) {
+  function adicionSumaResta(match, multipleSum) {
     const numbers = [match[1]];
     const rest = match[3];
 
@@ -336,33 +395,28 @@ const Aritmetica = () => {
     else if(additionalMatchesRest){
       numbers.push(...additionalMatchesRest);
     }
-
+    setNumeros(numbers);
     console.log('Numbers:', numbers);
   }
   // Operacion Suma y Resta
   function operacionSumaResta(text) {
       // Convertir el texto a minúsculas, eliminar cualquier punto o coma al final y recortar espacios en blanco
       const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
-      console.log('Texto procesado:', lowerText);
-    
-      // Verificar si el texto es una palabra que representa un número
-      if (numberWords.hasOwnProperty(lowerText)) {
-        let number = numberWords[lowerText];
-        if (number > 10) {
-          number = number % 10;
-        }
-        console.log('Número encontrado:', number);
-        setResultado(prevResultado => [number, ...prevResultado]);
-      } else if (!isNaN(lowerText)) {
-        let number = parseInt(lowerText, 10);
-        if (number > 10) {
-          number = number % 10;
-        }
-        console.log('Número encontrado:', number);
-        setResultado(prevResultado => [number, ...prevResultado]);
-      } else {
-        console.log('Texto no reconocido:', lowerText);
-        setMessage("Operación no reconocida, intenta de nuevo.");
+      
+      console.log('Texto procesado:', lowerText, numeros, digitoMayor.length, resultado.length);
+      const multipleSum = regexUtils.matchMultipleSum(lowerText);
+
+      if(multipleSum && multipleSum.length > 0)
+      {
+        if(digitoMayor.length === 4 && resultado.length < 3 && multipleSum[2] > 10){
+          multipleSum[2] = multipleSum[2] % 10;
+        }else if(digitoMayor.length === 3 && resultado.length < 2 && multipleSum[2] > 10){
+        multipleSum[2] = multipleSum[2] % 10;
+       }else if(digitoMayor.length === 2 && resultado.length < 1 && multipleSum[2] > 10){
+        multipleSum[2] = multipleSum[2] % 10;
+       }
+        console.log('Texto procesado 2:', multipleSum[2]);
+        setResultado(prevResultado => [multipleSum[2], ...prevResultado]);
       }
     }
     // Acarreo
@@ -766,11 +820,72 @@ const Aritmetica = () => {
       }
     }
 
+    const handleSave = async () => {
+      console.log("Entra", division, multiplicador, multiplicando, sumas, restas);
+    
+      try {
+        let operationData = null;
+        let uri = null;
+    
+        const newId = await generateUniqueId();
+    
+        if (division.length > 0) {
+          const { dividendo, divisor } = division[0];
+          console.log("Guardar division", division[0].dividendo );
+      
+          operationData = {
+            id: newId,
+            operacion: 'division',
+            detalles: {dividendo, divisor},
+          };
+        } else if (multiplicador&& multiplicando > 0) {
+          console.log("Guardar multiplicación", multiplicador, multiplicando);
+       
+          operationData = {
+            id: newId,
+            operacion: 'multiplicacion',
+            detalles: { multiplicador, multiplicando },
+          };
+        } else if (restas.length > 0) {
+          console.log("Guardar restas", restas);
+
+          operationData = {
+            id: newId,
+            operacion: 'resta',
+            detalles: { restas },
+          };
+        } else if (sumas.length > 0) {
+          console.log("Guardar sumas", sumas);
+ 
+          operationData = {
+            id: newId,
+            operacion: 'suma',
+            detalles: { sumas },
+          };
+        }
+    
+        // Si se creó operationData, guarda la operación
+        if (operationData) {
+          // Guardar la operación con la imagen capturada
+          await captureAndSaveOperation(viewShotRef, { ...operationData, foto: uri });
+          setCapturedImage(uri); // Actualiza el estado de la imagen capturada
+        
+          const ops = await getAllOperations();
+          setOperations(ops);
+          console.log('Operaciones actualizadas:', ops);
+        }
+      } catch (error) {
+        console.error('Error al capturar o guardar la operación:', error);
+      }
+    }
+
+ 
+
 // ---------------------------------------------------------------------------------------------------------------------- //
 // Renderizado de la división en pantalla
   const renderDivision = (division) => {
     if (!division) {
-      console.log("Division is undefined or null");
+      
       return null;
     }
   
@@ -781,7 +896,7 @@ const Aritmetica = () => {
   
     // Verificar nuevamente si division es undefined después de acceder al primer elemento del array
     if (!division) {
-      console.log("Division is undefined or null after accessing array element");
+      
       return null;
     }
     // Proporcionar valores predeterminados para dividendo y divisor
@@ -984,7 +1099,12 @@ const Aritmetica = () => {
           {realizar}
         </Animated.Text>
       )}
-      <Text style={styles.llevada}>{accarreo.join(' ')}</Text>
+      <Text style={[
+        styles.llevada2, 
+        digitoMayor.length === 2 && styles.llevada2,
+        digitoMayor.length === 3 && styles.llevada3,
+        digitoMayor.length === 4 && styles.llevada4
+    ]}>{accarreo.join(' ')}</Text>
       {paddedNumbers.map((paddedNum, index) => (
         <View key={index} style={styles.row}>
           <Text style={styles.operator}>
@@ -1021,6 +1141,7 @@ const Aritmetica = () => {
   
 return (
     <View style={styles.container}>
+      <ViewShot ref={viewShotRef} style={styles.container}>
     <Text style={[styles.text, styles.title]}>Aritmética</Text>
     {showBienvenida && !hasShownBienvenida && (
       <Animated.Text style={[styles.text, { opacity }]} onLayout={() => setHasShownBienvenida(false)}>
@@ -1040,6 +1161,8 @@ return (
 
       {operation && renderOperation(operation)}
       {division && renderDivision(division)}
+
+      </ViewShot>
     </View>
   );
 };

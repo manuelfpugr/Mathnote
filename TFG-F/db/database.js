@@ -1,50 +1,90 @@
-import * as SQLite from 'expo-sqlite';
+import ViewShot from 'react-native-view-shot';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
 
-const db = SQLite.openDatabaseSync('operaciones.db');
-
-// Crear la tabla de operaciones
-export const createTables = () => {
+/**
+ * Captura una parte específica de la pantalla y guarda la operación en AsyncStorage.
+ * @param {Object} viewShotRef - Referencia al componente ViewShot.
+ * @param {Object} operationData - Los datos de la operación (id, tipo, detalles).
+ */
+export const captureAndSaveOperation = async (viewShotRef, operationData) => {
+  console.log("CAPTURANDO Y GUARDANDO OPERACIÓN");
   try {
-    db.transaction(tx => {
-      tx.executeSql(
-        `CREATE TABLE IF NOT EXISTS operaciones (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          tipo_operacion TEXT NOT NULL,
-          operando1 REAL,
-          operando2 REAL,
-          operando3 REAL,
-          resultado REAL
-        );`,
-        [],
-        () => console.log('Tabla de operaciones creada'),
-        (tx, error) => console.error('Error al crear tabla de operaciones', error)
-      );
-    });
+    // Verificar que viewShotRef.current no sea null
+    if (!viewShotRef.current) {
+      throw new Error('viewShotRef.current is null');
+    }
+
+    // 1. Capturar la parte de la pantalla
+    const uri = await viewShotRef.current.capture();
+    console.log('Captura de pantalla realizada:', uri);
+
+    // 2. Agregar la URI de la captura a los datos de la operación
+    const operation = {
+      ...operationData, // Datos pasados como parámetros (id, operación, detalles)
+      foto: uri, // Guardar la URI de la captura
+    };
+
+    // 3. Guardar en AsyncStorage
+    await saveOperation(operation);
+
   } catch (error) {
-    console.error('Error al iniciar la base de datos', error);
+    console.error('Error al capturar o guardar la operación:', error);
   }
 };
 
-// Insertar una operación
-export const insertOperacion = (tipo_operacion, operando1, operando2, operando3, resultado) => {
-  db.transaction(tx => {
-    tx.executeSql(
-      'INSERT INTO operaciones (tipo_operacion, operando1, operando2, operando3, resultado) VALUES (?, ?, ?, ?, ?);',
-      [tipo_operacion, operando1, operando2, operando3, resultado],
-      (txObj, resultSet) => console.log('Operación insertada', resultSet),
-      (txObj, error) => console.error('Error al insertar operación', error)
-    );
-  });
+/**
+ * Guarda una operación en AsyncStorage.
+ * @param {Object} operation - Objeto que contiene los datos de la operación.
+ */
+const saveOperation = async (operation) => {
+  try {
+    const jsonValue = JSON.stringify(operation);
+    await AsyncStorage.setItem(`@operation_${operation.id}`, jsonValue);
+    console.log('Operación guardada en la base de datos');
+  } catch (error) {
+    console.error('Error al guardar la operación en la base de datos', error);
+  }
+};
+/**
+ * Obtiene todas las operaciones almacenadas en AsyncStorage.
+ * @returns {Promise<Array>} - Una promesa que resuelve con un array de operaciones.
+ */
+export const getAllOperations = async () => {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const operationKeys = keys.filter(key => key.startsWith('@operation_'));
+    const operations = await AsyncStorage.multiGet(operationKeys);
+    const parsedOperations = operations.map(operation => JSON.parse(operation[1]));
+
+    // Imprimir las operaciones en la consola en formato de lista
+    console.log('Operaciones almacenadas:');
+    parsedOperations.forEach((operation, index) => {
+      console.log(`\nOperación ${index + 1}:`);
+      console.log(`ID: ${operation.id}`);
+      console.log(`Tipo: ${operation.operacion}`);
+      console.log(`Detalles: ${JSON.stringify(operation.detalles, null, 2)}`);
+    });
+
+    return parsedOperations;
+  } catch (error) {
+    console.error('Error al obtener las operaciones de la base de datos', error);
+    return [];
+  }
 };
 
-// Obtener todas las operaciones
-export const getOperaciones = (setOperaciones) => {
-  db.transaction(tx => {
-    tx.executeSql(
-      'SELECT * FROM operaciones;',
-      [],
-      (txObj, { rows: { _array } }) => setOperaciones(_array),
-      (txObj, error) => console.error('Error al obtener operaciones', error)
-    );
-  });
+/**
+ * Obtiene todos los IDs de las operaciones almacenadas en AsyncStorage.
+ * @returns {Promise<Array>} - Una promesa que resuelve con un array de IDs.
+ */
+export const getAllOperationIds = async () => {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const operationKeys = keys.filter(key => key.startsWith('@operation_'));
+    return operationKeys.map(key => key.replace('@operation_', ''));
+  } catch (error) {
+    console.error('Error al obtener los IDs de las operaciones de la base de datos', error);
+    return [];
+  }
 };
