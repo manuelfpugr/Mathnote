@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
 
   spacingDividendo5: {
-    right: 130,
+    right: 135,
   },
 
   spacing2: {
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   procedimientoBajar3_5Dig: {
     top: 336,
     position: 'absolute',
-    left:100,
+    left:110,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   procedimientoRestar5Dig: {
     top: 165,
     position: 'absolute',
-    left:10,
+    left:15,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   
   procedimientoRestar2_5Dig: {
     top: 91,
-    right: 120,
+    right: 130,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -297,6 +297,13 @@ const styles = StyleSheet.create({
   procedimientoRestar3_5Dig: {
     top: 80,
     right: 100,
+    fontFamily: 'massallera',
+    fontSize: 30,
+  },
+
+  procedimientoRestar4_5Dig: {
+    top: 80,
+    right: 85,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -376,6 +383,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     width: 75,
   },
+
+  divBarBajar4_5Dig: {
+    top: 70,
+    height: 4,
+    right:80,
+    backgroundColor: 'black',
+    width: 75,
+  },
+
   dividendo2Dig1: {
     top: 30,
     position: 'absolute',
