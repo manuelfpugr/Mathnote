@@ -12,10 +12,6 @@ import Aritmetica from './Aritmetica';
 import Geometria from './Geometria';
 import Actividades from './Actividades';
 import AppLoading from 'expo-app-loading';
-import { name as appName } from './app.json';
-import { AppRegistry } from 'react-native';
-
-
 
 const Stack = createStackNavigator();
 
@@ -31,8 +27,6 @@ const App = () => {
   const [message, setMessage] = useState('');
   const [transcription, setTranscription] = useState('');
   const [fontsLoaded, setFontsLoaded] = useState(false);
-
-
 
   if (!fontsLoaded) {
     return (
@@ -192,10 +186,6 @@ const styles = StyleSheet.create({
 
   },
 });
-
-
-AppRegistry.registerComponent(appName, () => App);
-
 
 
 export default AppContainer;
