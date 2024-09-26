@@ -9,14 +9,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Font from 'expo-font';
 import Home from './Home';
 import Aritmetica from './Aritmetica';
+import ImageDetail from './ImageDetail';
 import Geometria from './Geometria';
 import Actividades from './Actividades';
 import AppLoading from 'expo-app-loading';
 import { name as appName } from './app.json';
 import { AppRegistry } from 'react-native';
-
-
-
 
 const Stack = createStackNavigator();
 
@@ -161,6 +159,7 @@ const AppContainer = () => (
         <Stack.Screen name="Aritmetica" component={Aritmetica} />
         <Stack.Screen name="Geometria" component={Geometria} />
         <Stack.Screen name="Actividades" component={Actividades} />
+        <Stack.Screen name="ImageDetail" component={ImageDetail} />
     </Stack.Navigator>
   </NavigationContainer>
 );
