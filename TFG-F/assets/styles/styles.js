@@ -6,6 +6,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
+  containerCaptura: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
   messageText: {
     bottom: 80,
     paddingBottom: 20,

@@ -88,3 +88,18 @@ export const getAllOperationIds = async () => {
     return [];
   }
 };
+
+/**
+ * Elimina una operación de AsyncStorage.
+ * @param {string} id - El ID de la operación a eliminar.
+ */
+export const deleteOperation = async (id) => {
+  try {
+    await AsyncStorage.removeItem(`@operation_${id}`);
+    console.log(`Operación con ID ${id} eliminada de la base de datos`);
+  } catch (error) {
+    console.error('Error al eliminar la operación de la base de datos', error);
+  }
+};
+
+

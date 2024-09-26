@@ -2,16 +2,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { Audio } from 'expo-av';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { createTables, insertOperation } from './db/database.js';
 import { captureAndSaveOperation, getAllOperations} from './db/database.js';
 import regexUtils from './utils/regexUtils.js';
 import styles from './assets/styles/styles.js';
 import AppLoading from 'expo-app-loading';
 import ViewShot from 'react-native-view-shot';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
+
 import { numeroConMasDigitos, numberWords , loadFonts, extractFirstNumber, removeDots, normalizeNumber, generateUniqueId} from './utils/utils.js';
 
 const Aritmetica = () => {
   // Captura de pantalla y db
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { operation } = route.params || {};
   const [lastId, setLastId] = useState(0);
   const [operations, setOperations] = useState([]);
   const viewShotRef = useRef(null);
@@ -58,79 +62,19 @@ const Aritmetica = () => {
   const [resultado2, setResultado2] = useState([]);
   const [resultado3, setResultado3] = useState([]);
   const [resultado4, setResultado4] = useState([]);
-  const [operation, setOperation] = useState(null);
+  const [operationMult, setOperationMult] = useState(null);
   const [inserciones, setInserciones] = useState({ fila0: 0, fila1: 0, fila2: 0 });
   const [multiplicador, setMultiplicador] = useState([]);
   const [multiplicando, setMultiplicando] = useState([]);
   const [multiplicacion, setMultiplicacion] = useState([]);
   const [filasCompletas, setFilasCompletas] = useState(false);
+  const [filaAnterior, setFilaAnterior] = useState(0);
   // Mensajes de bienvenida y navegación
   const [fontsLoaded, setFontsLoaded] = useState(false);
   const [showBienvenida, setShowBienvenida] = useState(true);
   const [showNavegacion, setShowNavegacion] = useState(false);
   const [hasShownBienvenida, setHasShownBienvenida] = useState(false);
   const [hasShownNavegacion, setHasShownNavegacion] = useState(false);
-
-  React.useEffect(() => {
-    console.log("Hola");
-    const fetchOperations = async () => {
-      const ops = await getAllOperations();
-      setOperations(ops);
-      console.log('Operaciones almacenadas:', ops);
-    };
-
-    fetchOperations();
-  }, []);
-
-  React.useEffect(() => {
-    
-    const requestPermissions = async () => {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Se requieren permisos para acceder a la biblioteca de medios.');
-      }
-    };
-    requestPermissions();
-  }, []);
-
-  
-
-  React.useEffect(() => {
-    if (!hasShownBienvenida && !hasShownNavegacion) {
-      const timer1 = setTimeout(() => {
-        Animated.timing(opacity, {
-          toValue: 0,
-          duration: 2000,
-          useNativeDriver: true,
-        }).start(() => {
-          setShowBienvenida(false);
-          setHasShownBienvenida(true);
-          const timer2 = setTimeout(() => {
-            setShowNavegacion(true);
-            setHasShownNavegacion(true);
-            Animated.timing(opacity, {
-              toValue: 1,
-              duration: 2000,
-              useNativeDriver: true,
-            }).start();
-          }, 2000); // Espera 2 segundos antes de mostrar el mensaje de navegación
-          return () => clearTimeout(timer2);
-        });
-      }, 3000);
-  
-      return () => clearTimeout(timer1);
-    }
-  }, [hasShownBienvenida, hasShownNavegacion]);
-
-  if (!fontsLoaded) {
-    return (
-      <AppLoading
-        startAsync={loadFonts}
-        onFinish={() => setFontsLoaded(true)}
-        onError={console.warn}
-      />
-    );
-  }
 
   const startRecording = async () => {
     try {
@@ -228,8 +172,12 @@ const Aritmetica = () => {
     // Captura y guardar operación
     const guardar = regexUtils.matchGuardarOperacion(text);
 
-    console.log('Texto:',text, match);
-    if (match && operacion === false && division.length === 0) {
+    console.log('Texto:',text, match, filasCompletas);
+    if(guardar){
+      console.log('Guardar operación');
+      handleSave();
+    }
+    else if (match && operacion === false && division.length === 0) {
       // Extraer todos los números y el operador
       const numbers = [match[1]];
       let operator = match[2];
@@ -297,7 +245,7 @@ const Aritmetica = () => {
       }
       // setAccarreo(prevAccarreo => [' ', ...prevAccarreo]);
       // Llamar a setOperation con una lista de números y el operador
-      setOperation({ numbers, operator });
+      setOperationMult({ numbers, operator });
       setOperacion(true);
     }if(cogerNumeroMatch){
     
@@ -341,20 +289,105 @@ const Aritmetica = () => {
       
      adicionSumaResta(match);
   
-    }else if (operacion === true && !matchAccarreo && !guardar) {
+    }else if (operacion === true && !matchAccarreo && !guardar && multiplicador.length === 0 && multiplicando.length === 0) {
       operacionSumaResta(text);
     }else if(matchAccarreo){
       funcionAcarreo(matchAccarreo, division);
 
     }
-    else if(guardar){
-      console.log('Guardar operación');
-      handleSave();
-    }
+   
      else if(sumas.length === 0 && division.length === 0 && restas.length === 0 && multiplicacion.length === 0){
-      setMessage("Operación no reconocida, inténtalo de nuevo.");
+
     }
   };
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (operation) {
+        // Prellenar los campos según el tipo de operación
+        if (operation.operacion === 'multiplicacion') {
+          setMultiplicador(operation.detalles.multiplicador);
+          setMultiplicando(operation.detalles.multiplicando);
+          console.log('Multiplicador:', multiplicador, 'Multiplicando:', multiplicando);
+          handleOperation(`${operation.detalles.multiplicador} x ${operation.detalles.multiplicando}`);
+        } else if (operation.operacion === 'suma') {
+          console.log('Sumas: ----------------------------------------------------------------', operation.detalles.sumas.join(' mas '));
+          setSumas(operation.detalles.sumas);
+          handleOperation(operation.detalles.sumas.join(' más '));
+        } else if (operation.operacion === 'resta') {
+          setRestas(operation.detalles.restas);
+          handleOperation(operation.detalles.restas.join(' menos '));
+        } else if (operation.operacion === 'division') {
+          const { dividendo, divisor } = operation.detalles;
+          setDivision({ dividendo, divisor });
+          handleOperation(`${dividendo} entre ${divisor}`);
+        }
+      }
+    }, [operation])
+  );
+  
+  React.useEffect(() => {
+    const fetchOperations = async () => {
+      const ops = await getAllOperations();
+      setOperations(ops);
+      console.log('Operaciones almacenadas:', ops);
+    };
+
+    fetchOperations();
+  }, []);
+
+  React.useEffect(() => {
+    
+    const requestPermissions = async () => {
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Se requieren permisos para acceder a la biblioteca de medios.');
+      }
+    };
+    requestPermissions();
+  }, []);
+
+  
+
+  React.useEffect(() => {
+    if (!hasShownBienvenida && !hasShownNavegacion) {
+      const timer1 = setTimeout(() => {
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }).start(() => {
+          setShowBienvenida(false);
+          setHasShownBienvenida(true);
+          const timer2 = setTimeout(() => {
+            setShowNavegacion(true);
+            setHasShownNavegacion(true);
+            Animated.timing(opacity, {
+              toValue: 1,
+              duration: 2000,
+              useNativeDriver: true,
+            }).start();
+          }, 2000); // Espera 2 segundos antes de mostrar el mensaje de navegación
+          return () => clearTimeout(timer2);
+        });
+      }, 3000);
+  
+      return () => clearTimeout(timer1);
+    }
+  }, [hasShownBienvenida, hasShownNavegacion]);
+
+  if (!fontsLoaded) {
+    return (
+      <AppLoading
+        startAsync={loadFonts}
+        onFinish={() => setFontsLoaded(true)}
+        onError={console.warn}
+      />
+    );
+  }
+
+
 
   const calculateRightPosition = (resultado) => {
     const partes = String(resultado).split(',').map(part => part.trim());
@@ -442,20 +475,44 @@ const Aritmetica = () => {
   // Métodos para la Multiplicación
     // Procesado de las filas
   function procesarFila(fila, numPorFila, expectedResult, filasMultiplicacion, resultado) {
-      if (expectedResult >= 10 && fila === numPorFila - 1) {
-          setResultado(prevResultado => [expectedResult, ...prevResultado]);
+    console.log("Fila", fila, numPorFila,  inserciones[`fila${fila}`]);
+
+    if (fila === 1 && filaAnterior === 0 && !reinicioAcarreo) {
+      setAcarreo([]);
+      setreinicioAcarreo(true); // Desactivar la bandera después de reiniciar acarreo
+    }else if (fila === 2 && filaAnterior === 1 && !reinicioAcarreo2) {
+      setAcarreo([]);
+      setreinicioAcarreo2(true); // Desactivar la bandera después de reiniciar acarreo
+    }else if (fila === 3 && filaAnterior === 2 && !reinicioAcarreo3) {
+      setAcarreo([]);
+      setreinicioAcarreo2(true); // Desactivar la bandera después de reiniciar acarreo
+    }
+
+    const setResultadoFila = (fila, value) => {
+      if (fila === 0) {
+        setResultado(prevResultado => [value, ...prevResultado]);
+      } else if (fila === 1) {
+        setResultado2(prevResultado => [value, ...prevResultado]);
+      } else if (fila === 2) {
+        setResultado3(prevResultado => [value, ...prevResultado]);
+      }
+    };
+
+      if (expectedResult >= 10 && inserciones[`fila${fila}`] === numPorFila - 1) {
+          setResultadoFila(fila, expectedResult);
           setInserciones(prevInserciones => ({ ...prevInserciones, [`fila${fila}`]: prevInserciones[`fila${fila}`] + 1 }));
           console.log(`Fila ${fila} Mod Final`, filasMultiplicacion, resultado);
       } else if (expectedResult >= 10) {
           let expectedResultMod = expectedResult % 10;
-          setResultado(prevResultado => [expectedResultMod, ...prevResultado]);
+          setResultadoFila(fila, expectedResultMod);
           setInserciones(prevInserciones => ({ ...prevInserciones, [`fila${fila}`]: prevInserciones[`fila${fila}`] + 1 }));
           console.log(`Fila ${fila} Mod`, filasMultiplicacion, resultado);
       } else {
-          setResultado(prevResultado => [expectedResult, ...prevResultado]);
+          setResultadoFila(fila, expectedResult);
           setInserciones(prevInserciones => ({ ...prevInserciones, [`fila${fila}`]: prevInserciones[`fila${fila}`] + 1 }));
           console.log(`Fila ${fila}`, filasMultiplicacion, resultado);
       }
+      setFilaAnterior(fila); // Actualizar la fila anterior
   }
   // Procesado del resto de la multiplicación
   function procesarMultiplicacion(expectedResult, multiplicador, multiplicando, inserciones, reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas, resultado) {
@@ -500,13 +557,13 @@ const Aritmetica = () => {
 
         if (reinicioAcarreo === true && numFilas === 1) {
             console.log("Para una Fila");
-            filasCompletas = true;
+            setFilasCompletas(true);
         } else if (reinicioAcarreo2 === true && numFilas === 2) {
             console.log("Para dos Filas");
-            filasCompletas = true;
+            setFilasCompletas(true);
         } else if (reinicioAcarreo3 === true && numFilas === 3) {
             console.log("Para tres Filas");
-            filasCompletas = true;
+            setFilasCompletas(true);
         }
 
         console.log("Reinicios", reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas);
@@ -873,6 +930,7 @@ const Aritmetica = () => {
           const ops = await getAllOperations();
           setOperations(ops);
           console.log('Operaciones actualizadas:', ops);
+          navigation.navigate('Home');
         }
       } catch (error) {
         console.error('Error al capturar o guardar la operación:', error);
@@ -1083,8 +1141,8 @@ const Aritmetica = () => {
       );
   };
 // Renderizado de las operaciones de resta multiplicación y suma
-  const renderOperation = (operation) => {
-    const { numbers, operator } = operation;
+  const renderOperation = (operationMult) => {
+    const { numbers, operator } = operationMult;
   
     // Padding para asegurar que los números estén alineados a la derecha
     const maxLength = Math.max(...numbers.map(num => num.length));
@@ -1141,7 +1199,6 @@ const Aritmetica = () => {
   
 return (
     <View style={styles.container}>
-      <ViewShot ref={viewShotRef} style={styles.container}>
     <Text style={[styles.text, styles.title]}>Aritmética</Text>
     {showBienvenida && !hasShownBienvenida && (
       <Animated.Text style={[styles.text, { opacity }]} onLayout={() => setHasShownBienvenida(false)}>
@@ -1158,8 +1215,8 @@ return (
       <TouchableOpacity style={styles.micButton} onPress={recording ? stopRecording : startRecording}>
         <Icon name={recording ? 'stop' : 'microphone'} size={60} color={recording ? 'red' : 'black'} />
       </TouchableOpacity>
-
-      {operation && renderOperation(operation)}
+      <ViewShot ref={viewShotRef} style={[styles.containerCaptura ]}>
+      {operationMult && renderOperation(operationMult)}
       {division && renderDivision(division)}
 
       </ViewShot>
