@@ -172,7 +172,7 @@ const Aritmetica = () => {
     // Captura y guardar operación
     const guardar = regexUtils.matchGuardarOperacion(text);
 
-    console.log('Texto:',text, match, filasCompletas);
+    console.log('Texto:',text, match, filasCompletas, divisionProc3);
     if(guardar){
       console.log('Guardar operación');
       handleSave();
@@ -260,8 +260,8 @@ const Aritmetica = () => {
     }
     
   }
- else if(div && ( divisionProc1 || (division.length > 0 && resultAcarreo) || resultMult || divisionProcAcarreo || divisionProc2 || divisionProc3 || procedimientoBajarNum || procedimientoResta || procedimientoResta2 ||coma) ){
- 
+ else if(division && ( divisionProc1 || (division.length > 0 && resultAcarreo) || resultMult || divisionProcAcarreo || div || divisionProc2 || divisionProc3 || procedimientoBajarNum || procedimientoResta || procedimientoResta2 || coma) ){
+ console.log("AQUI");
   divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajarNum, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, procedimientoDivLinea3, cociente);
   }else if(filasCompletas && division.length === 0){
       sumaMultiplicacion(text);
