@@ -340,15 +340,15 @@ const Home = () => {
     )}
     {message && <Text style={styles.text}>{message}</Text>}
   
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Aritmética</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Geometría</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Ver Actividades</Text>
-      </TouchableOpacity>
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Aritmetica')}>
+      <Text style={styles.buttonText}>Aritmética</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Geometria')}>
+      <Text style={styles.buttonText}>Geometría</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Actividades')}>
+      <Text style={styles.buttonText}>Ver Actividades</Text>
+    </TouchableOpacity>
 
       <TouchableOpacity style={styles.micButton} onPress={recording ? stopRecording : startRecording}>
         <Icon name={recording ? 'stop' : 'microphone'} size={60} color={recording ? 'red' : 'black'} />
@@ -389,14 +389,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 15,
     borderRadius: 10,
-    backgroundColor: '#007BFF',
+    backgroundColor: 'black',
     alignItems: 'center',
     width: '80%',
   },
   buttonText: {
-    fontSize: 20,
-    color: '#FFFFFF',
-    fontWeight: '600',
+    
+    fontFamily: 'massallera',
+    fontSize: 25,
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
