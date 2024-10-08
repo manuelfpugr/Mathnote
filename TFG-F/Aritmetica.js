@@ -260,7 +260,7 @@ const Aritmetica = () => {
     }
     
   }
- else if(division && ( divisionProc1 || (division.length > 0 && resultAcarreo) || resultMult || divisionProcAcarreo || div || divisionProc2 || divisionProc3 || procedimientoBajarNum || procedimientoResta || procedimientoResta2 || coma) ){
+ else if(division.length > 0 && ( divisionProc1 || (division.length > 0 && resultAcarreo) || resultMult || divisionProcAcarreo || div || divisionProc2 || divisionProc3 || procedimientoBajarNum || procedimientoResta || procedimientoResta2 || coma) ){
  console.log("AQUI");
   divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajarNum, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, procedimientoDivLinea3, cociente);
   }else if(filasCompletas && division.length === 0){
@@ -478,13 +478,13 @@ const Aritmetica = () => {
     console.log("Fila", fila, numPorFila,  inserciones[`fila${fila}`]);
 
     if (fila === 1 && filaAnterior === 0 && !reinicioAcarreo) {
-      setAcarreo([]);
+      setAccarreo([]);
       setreinicioAcarreo(true); // Desactivar la bandera después de reiniciar acarreo
     }else if (fila === 2 && filaAnterior === 1 && !reinicioAcarreo2) {
-      setAcarreo([]);
+      setAccarreo([]);
       setreinicioAcarreo2(true); // Desactivar la bandera después de reiniciar acarreo
     }else if (fila === 3 && filaAnterior === 2 && !reinicioAcarreo3) {
-      setAcarreo([]);
+      setAccarreo([]);
       setreinicioAcarreo2(true); // Desactivar la bandera después de reiniciar acarreo
     }
 
@@ -736,6 +736,7 @@ const Aritmetica = () => {
     }
 
     function divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajar, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, cociente) {
+      console.log("Falla aqui");     
       if (division && division.length === 0) {
         let divMod = normalizeNumber(div);
         console.log("Division 2", divMod, division, resultMult);    
