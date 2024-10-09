@@ -1,25 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Audio } from 'expo-av';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Font from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import regexUtils from './utils/regexUtils.js';
-
+import ViewShot from 'react-native-view-shot';
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import styles from './assets/styles/styles.js';
+import {useRoute} from '@react-navigation/native';
+import { captureAndSaveOperation, getAllOperations} from './db/database.js';
 
-import {drawAngle, normalizeText} from './utils/utils.js'; 
+import {drawAngle, normalizeText, generateUniqueId} from './utils/utils.js'; 
 
 
 
 const Geometria = () => {
-
+  //Guardado
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { operation } = route.params || {};
+  const [lastId, setLastId] = useState(0);
+  const [operations, setOperations] = useState([]);
+  const viewShotRef = useRef(null);
+  const [capturedImage, setCapturedImage] = React.useState(null);
+  //Elementos de la geometría
   const [opacity] = useState(new Animated.Value(1));
   const [recording, setRecording] = useState(null);
   const [message, setMessage] = useState('');
@@ -101,11 +112,17 @@ const Geometria = () => {
     const figure3DRegex = regexUtils.matchGeometric3DFigure(normalizedText);
     const angleRegex = regexUtils.matchAngle(normalizedText);
     const dimensionMatch = regexUtils.matchDimension(normalizedText); // Captura la dimensión
+    const guardar = regexUtils.matchGuardarOperacion(text); //Guardado
   
     console.log("Dimension: ", dimensionMatch, normalizedText);
     console.log("Figura: ", figure);
 
-    if (dimensionMatch && figure === null) {
+    if(guardar){
+      console.log('Guardar operación');
+      handleSave();
+    }
+
+    else if (dimensionMatch && figure === null) {
       setMessage('Define primero la figura');
     }
     else if (figureRegex) {
@@ -113,7 +130,7 @@ const Geometria = () => {
     } else if (figure3DRegex) {
       setFigure(figure3DRegex[4]);
     } else if (angleRegex) {
-      setFigure('ángulo');
+      setFigure('angulo');
       setAngleDegrees(angleRegex); // Actualiza el estado del ángulo
     } else if (dimensionMatch && figure ) {
       console.log("Dimension 2 ", dimensionMatch);
@@ -255,6 +272,10 @@ const Geometria = () => {
                 setDistFocal(dimensionValue);
                 console.log("distFocal: " + distFocal);
               }
+              else if (dimensionType === 'area') {
+                setArea(dimensionValue);
+                console.log("Área: " + area);
+              }
               else if (dimensionType === 'radio') {
                 setRadio(dimensionValue);
                 console.log("Radio: " + radio);
@@ -342,10 +363,6 @@ const Geometria = () => {
                 setVolumen(dimensionValue);
                 console.log("Volumen: " + volumen);
               }
-              else if(dimensionType === 'circunferencia') {
-                setCircunferencia(dimensionValue);
-                console.log("Circunferencia: " + circunferencia);
-              }
               break;
             case 'cono':
               if(dimensionType === 'radio') {
@@ -372,6 +389,310 @@ const Geometria = () => {
         }
       }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (operation) {
+        // Prellenar los campos según el tipo de operación
+        switch (operation.operacion) {
+          case 'cuadrado':
+            setFigure('cuadrado');
+            console.log('Cuadrado: ----------------------------------------------------------------');
+            setLado(operation.detalles.lado);
+            setArea(operation.detalles.area);
+            setPerimetro(operation.detalles.perimetro);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'triangulo':
+            setFigure('triangulo');
+            console.log('Triángulo: ----------------------------------------------------------------');
+            setAltura(operation.detalles.altura);
+            setBase(operation.detalles.base);
+            setArea(operation.detalles.area);
+            setLado(operation.detalles.lado);
+            setPerimetro(operation.detalles.perimetro);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'rectangulo':
+            setFigure('rectangulo');
+            console.log('Rectángulo: ----------------------------------------------------------------');
+            setBase(operation.detalles.base);
+            setAltura(operation.detalles.altura);
+            setPerimetro(operation.detalles.perimetro);
+            setArea(operation.detalles.area);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'circulo':
+            setFigure('circulo');
+            console.log('Círculo: ----------------------------------------------------------------');
+            setRadio(operation.detalles.radio);
+            setDiametro(operation.detalles.diametro);
+            setCircunferencia(operation.detalles.circunferencia);
+            setArea(operation.detalles.area);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'pentagono':
+            setFigure('pentagono');
+            console.log('Pentágono: ----------------------------------------------------------------');
+            setLado(operation.detalles.lado);
+            setArea(operation.detalles.area);
+            setPerimetro(operation.detalles.perimetro);
+            setAltura(operation.detalles.altura);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'hexagono':
+            setFigure('hexagono');
+            console.log('Hexágono: ----------------------------------------------------------------');
+            setLado(operation.detalles.lado);
+            setArea(operation.detalles.area);
+            setPerimetro(operation.detalles.perimetro);
+            setAltura(operation.detalles.altura);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'rombo':
+            setFigure('rombo');
+            console.log('Rombo: ----------------------------------------------------------------');
+            setLado(operation.detalles.lado);
+            setDiagonalMayor(operation.detalles.diagonalMayor);
+            setDiagonalMenor(operation.detalles.diagonalMenor);
+            setArea(operation.detalles.area);
+            setPerimetro(operation.detalles.perimetro);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'elipse':
+            setFigure('elipse');
+            console.log('Elipse: ----------------------------------------------------------------');
+            setEjeMayor(operation.detalles.ejeMayor);
+            setEjeMenor(operation.detalles.ejeMenor);
+            setDistFocal(operation.detalles.distFocal);
+            setArea(operation.detalles.area);
+            setRadio(operation.detalles.radio);
+            setDiametro(operation.detalles.diametro);
+
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'esfera':
+            setFigure('esfera');
+            console.log('Esfera: ----------------------------------------------------------------');
+            setRadio(operation.detalles.radio);
+            setDiametro(operation.detalles.diametro);
+            setArea(operation.detalles.area);
+            setVolumen(operation.detalles.volumen);
+            setCircunferencia(operation.detalles.circunferencia);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'piramide':
+            setFigure('piramide');
+            console.log('Pirámide: ----------------------------------------------------------------');
+            setLado(operation.detalles.lado);
+            setAltura(operation.detalles.altura);
+            setApotema(operation.detalles.apotema);
+            setArea(operation.detalles.area);
+            setVolumen(operation.detalles.volumen);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'cubo':
+            setFigure('cubo');
+            console.log('Cubo: ----------------------------------------------------------------');
+            setLado(operation.detalles.lado);
+            setArea(operation.detalles.area);
+            setVolumen(operation.detalles.volumen);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'cilindro':
+            setFigure('cilindro');
+            console.log('Cilindro: ----------------------------------------------------------------');
+            handleOperation(`dibuja un ${operation.tipo}`);
+            setRadio(operation.detalles.radio);
+            setDiametro(operation.detalles.diametro);
+            setArea(operation.detalles.area);
+            setAltura(operation.detalles.altura);
+            setVolumen(operation.detalles.volumen);
+            break;
+          case 'cono':
+            setFigure('cono');
+            console.log('Cono: ----------------------------------------------------------------');
+            setRadio(operation.detalles.radio);
+            setArea(operation.detalles.area);
+            setVolumen(operation.detalles.volumen);
+            setDiametro(operation.detalles.diametro);
+            setAltura(operation.detalles.altura);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          case 'angulo':
+            setFigure('angulo');
+            console.log('Ángulo: ----------------------------------------------------------------');
+            setAngleDegrees(operation.detalles.angleDegrees);
+            handleOperation(`dibuja un ${operation.tipo}`);
+            break;
+          default:
+            console.error('Operación no reconocida:', operation.operacion);
+        }
+      }
+    }, [operation])
+  );
+
+  useEffect(() => {
+    const fetchOperations = async () => {
+      const ops = await getAllOperations();
+      setOperations(ops);
+      console.log('Operaciones almacenadas:', ops);
+    };
+
+    fetchOperations();
+  }, []);
+
+  const handleSave = async () => {
+    console.log("Entra", figure, lado, base, altura, area, perimetro, radio, diametro, diagonalMayor, diagonalMenor, ejeMayor, ejeMenor, distFocal, volumen, circunferencia, apotema);
+  
+    try {
+      let elementData = null;
+      let uri = null;
+  
+      const newId = await generateUniqueId();
+  
+      // Verifica el valor de figure
+      console.log("Valor de figure:", figure);
+  
+      switch (figure.trim().toLowerCase()) {
+        case 'cuadrado':
+          elementData = {
+            id: newId,
+            operacion: 'cuadrado',
+            detalles: { lado, area, perimetro },
+          };
+          break;
+  
+        case 'triangulo':
+          elementData = {
+            id: newId,
+            operacion: 'triangulo',
+            detalles: { lado, base, altura, area, perimetro },
+          };
+          break;
+  
+        case 'rectangulo':
+          elementData = {
+            id: newId,
+            operacion: 'rectangulo',
+            detalles: { base, altura, area, perimetro },
+          };
+          break;
+  
+        case 'circulo':
+          elementData = {
+            id: newId,
+            operacion: 'circulo',
+            detalles: { radio, diametro, circunferencia, area },
+          };
+          break;
+  
+        case 'pentagono':
+          elementData = {
+            id: newId,
+            operacion: 'pentagono',
+            detalles: { lado, altura, area, perimetro },
+          };
+          break;
+  
+        case 'hexagono':
+          elementData = {
+            id: newId,
+            operacion: 'hexagono',
+            detalles: { lado, altura, area, perimetro },
+          };
+          break;
+  
+        case 'rombo':
+          elementData = {
+            id: newId,
+            operacion: 'rombo',
+            detalles: { lado, diagonalMayor, diagonalMenor, area, perimetro },
+          };
+          break;
+  
+        case 'elipse':
+          elementData = {
+            id: newId,
+            operacion: 'elipse',
+            detalles: { ejeMayor, ejeMenor, distFocal, radio, diametro },
+          };
+          break;
+  
+        case 'esfera':
+          elementData = {
+            id: newId,
+            operacion: 'esfera',
+            detalles: { radio, diametro, area, volumen, circunferencia },
+          };
+          break;
+  
+        case 'piramide':
+          elementData = {
+            id: newId,
+            operacion: 'piramide',
+            detalles: { lado, altura, apotema, area, volumen },
+          };
+          break;
+  
+        case 'cubo':
+          elementData = {
+            id: newId,
+            operacion: 'cubo',
+            detalles: { lado, area, volumen },
+          };
+          break;
+  
+        case 'cilindro':
+          elementData = {
+            id: newId,
+            operacion: 'cilindro',
+            detalles: { radio, altura, diametro, area, volumen, circunferencia },
+          };
+          break;
+  
+        case 'cono':
+          elementData = {
+            id: newId,
+            operacion: 'cono',
+            detalles: { radio, altura, diametro, area, volumen },
+          };
+          break;
+
+        case 'angulo':
+          elementData = {
+            id: newId,
+            operacion: 'angulo',
+            detalles: { angleDegrees },
+          };
+          break;
+
+  
+        default:
+          console.error('Figura geométrica no reconocida:', figure);
+          return;
+      }
+  
+      // Verifica el valor de elementData
+      console.log("Valor de elementData:", elementData);
+  
+      // Si se creó elementData, guarda la figura geométrica
+      if (elementData) {
+        // Guardar la figura geométrica con la imagen capturada
+        await captureAndSaveOperation(viewShotRef, { ...elementData, foto: uri });
+        setCapturedImage(uri); // Actualiza el estado de la imagen capturada
+  
+        const elements = await getAllOperations();
+        setOperations(elements);
+        console.log('Figuras geométricas actualizadas:', elements);
+        navigation.navigate('Home');
+      }
+    } catch (error) {
+      console.error('Error al capturar o guardar la figura geométrica:', error);
+    }
+  };
+
+
   const renderIcon = () => {
     console.log("Figure: " + figure);
     switch (figure) {
@@ -611,592 +932,17 @@ const Geometria = () => {
       <TouchableOpacity style={styles.micButton} onPress={recording ? stopRecording : startRecording}>
         <Icon name={recording ? 'stop' : 'microphone'} size={60} color={recording ? 'red' : 'black'} />
       </TouchableOpacity>
-
+      <ViewShot ref={viewShotRef} style={[styles.viewShot ]}>
       {figure && (
         <View style={styles.iconContainer}>
           {renderIcon()}
         </View>
       )}
-
+      </ViewShot>
     </View>
 
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-  iconContainer: {
-    position: 'absolute',
-    bottom: 50,
-    justifyContent: 'center',
-    padding: 10,
-    borderRadius: 50,
-  
-  },
-  messageText: {
-    paddingBottom: 20,
-    textAlign: 'justify',
-    fontSize: 20,
-    fontWeight: '600',
-    fontFamily: 'massallera',
-  },
-  dimensionText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: 'black',
-    marginBottom: 0,
-    fontFamily: 'massallera',
-  },
-
-  squareText: {
-    bottom: 270,
-    left: 145,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-
-  cuboText: {
-    bottom: 120,
-    left: 8,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-
-  pentagonText: {
-    bottom: 80,
-    left: 10,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-  pentagonText2: {
-    bottom: 80,
-    left: 120,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-
-  pentagonBar: {
-    position: 'absolute',
-    width: 2,
-    height: '30%',
-    backgroundColor: 'red',
-    top: 153,
-    left: '50%',
-    transform: [{ translateX: -1 }],
-  },
-  hexagonBar: {
-    position: 'absolute',
-    width: 2,
-    height: '30%',
-    backgroundColor: 'red',
-    top: 158,
-    left: '50%',
-    transform: [{ translateX: -1 }],
-  },
-
-  hexagonText: {
-    bottom: 130,
-    left: 10,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-
-  romboText: {
-    bottom: 220,
-    left: 80,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-
-  diagonalMayorText: {
-    bottom: 110,
-    left: 160,
-    fontSize: 20,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'red',
-  },
-  diagonalMayorBar: {
-    position: 'absolute',
-    width: 2,
-    height: '54%',
-    backgroundColor: 'red',
-    top: 69,
-    left: '50%',
-    transform: [{ translateX: -1 }],
-  },
-
-  diagonalMenorText: {
-    bottom: 160,
-    left: 130,
-    fontSize: 20,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'blue',
-  },
-  diagonalMenorBar: {
-    position: 'absolute',
-    width: '39%',
-    height: 2,
-    backgroundColor: 'blue',
-    top: 150,
-    left: 22,
-    transform: [{ translateX: 70}],
-},
-
-  point: {
-    width: 10, // Ancho del punto
-    height: 10, // Alto del punto
-    borderRadius: 10, // Hace que el punto sea redondo
-    backgroundColor: 'black', // Color del punto
-    position: 'absolute', // Posicionamiento absoluto
-  },
-  point1: {
-    top: 146, // Posición del primer punto
-    left: 80,
-  },
-  point2: {
-    top: 146, // Posición del segundo punto
-    left: 210,
-  },
-
-
-
-ejeMayorText: {
-  bottom: 100,
-  left: 160,
-  fontSize: 20,
-  fontWeight: '600',
-  position: 'absolute',
-  fontFamily: 'massallera',
-  color: 'red',
-},
-ejeMayorBar: {
-  position: 'absolute',
-  width: '67%',
-  height: 2,
-  backgroundColor: 'red',
-  top: 150,
-  left: '17%',
-  transform: [{ translateX: -1 }],
-},
-ejeMenorText: {
-  bottom: 170,
-  left: 160,
-  fontSize: 20,
-  fontWeight: '600',
-  position: 'absolute',
-  fontFamily: 'massallera',
-  color: 'blue',
-},
-ejeMenorBar: {
-  position: 'absolute',
-  width: 2,
-  height: '52%',
-  backgroundColor: 'blue',
-  top: 70,
-  left: '50%',
-  transform: [{ translateX: -1 }],
-},
-distFocalText: {
-  bottom: 100,
-  left: 100,
-  fontSize: 20,
-  fontWeight: '600',
-  position: 'absolute',
-  fontFamily: 'massallera',
-  color: 'green',
-},
-distFocalBar: {
-  position: 'absolute',
-  width: '43%',
-  height: 3,
-  backgroundColor: 'green',
-  top: 150,
-  left: '30%',
-  transform: [{ translateX: -1 }],
-},
-  circleText: {
-    bottom: 100,
-    left: 135,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-
-  circleText2: {
-    bottom: 180,
-    left: 190,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-
-  esferaText: {
-    bottom: 125,
-    left: 100,
-    fontSize: 15,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'blue',
-  },
-
-  esferaBar: {
-    position: 'absolute',
-    width: '35%',
-    height: 2,
-    backgroundColor: 'blue',
-    top: 150,
-    left: '16%',
-  },
-
-  esferaBar2: {
-    position: 'absolute',
-    width: 2,
-    height: '17%',
-    backgroundColor: 'red',
-    top: 124,
-    left: '50%',
-  },
-
-  
-  esferaText2: {
-    bottom: 150,
-    left: 160,
-    fontSize: 15,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'red',
-  },
-
-  cilindroText: {
-    bottom: 70,
-    left: 120,
-    fontSize: 15,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'blue',
-  },
-
-  
-  cilindroText2: {
-    bottom: 220,
-    left: 120,
-    fontSize: 15,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'green',
-  },
-
-  cilindroText3: {
-    bottom: 130,
-    left: 160,
-    fontSize: 15,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'red',
-  },
-
-
-  cilindroBar: {
-    position: 'absolute',
-    width: '30%',
-    height: 2,
-    backgroundColor: 'blue',
-    top: 225,
-    left: '20%',
-  },
-
-  cilindroBar2: {
-    position: 'absolute',
-    width: '58%',
-    height: 2,
-    backgroundColor: 'green',
-    top: 75,
-    left: '21%',
-  },
-
-  cilindroBar3: {
-    position: 'absolute',
-    width: 2,
-    height: '50%',
-    backgroundColor: 'red',
-    top: 77,
-    left: '50%',
-  },
-
-  conoText: {
-    bottom: 70,
-    left: 120,
-    fontSize: 15,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'blue',
-  },
-
-  
-  conoText2: {
-    bottom: 47,
-    left: 160,
-    fontSize: 15,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'green',
-  },
-
-  conoText3: {
-    bottom: 130,
-    left: 160,
-    fontSize: 15,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'red',
-  },
-
-
-  conoBar: {
-    position: 'absolute',
-    width: '67%',
-    height: 2,
-    backgroundColor: 'blue',
-    top: 225,
-    left: '16%',
-  },
-
-  conoBar2: {
-    position: 'absolute',
-    width: 2,
-    height: '9%',
-    backgroundColor: 'green',
-    top: 225,
-    left: '50%',
-  },
-
-  conoBar3: {
-    position: 'absolute',
-    width: 2,
-    height: '55%',
-    backgroundColor: 'red',
-    top: 62,
-    left: '50%',
-  },
-
-
-
-  rectangleText: {
-    bottom: 220,
-    left: 165,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-
-  rectangleText2: {
-    bottom: 100,
-    left:10,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-  squareText2: {
-    top: 135,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-
-  circleBar: {
-    position: 'absolute',
-    height: 2,
-    width: '28%',
-    backgroundColor: 'blue',
-    top: '50%',
-    left: 47,
-    transform: [{ translateX: 32 }, { translateY: -1 }],
-  },
-
-  circleBar2: {
-    position: 'absolute',
-    height: '67%',
-    width: 2,
-    backgroundColor: 'red',
-    top: 50,
-    left: '50%',
-},
-
-  triangleContainer: {
-    position: 'relative',
-    width: 300,
-    height: 300,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  rectangleContainer: {
-    position: 'relative',
-    width: 360,
-    height: 300,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  circleContainer: {
-    position: 'relative',
-    width: 300,
-    height: 300,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  redBar: {
-    position: 'absolute',
-    width: 2,
-    height: '65%',
-    backgroundColor: 'red',
-    top: 58,
-    left: '50%',
-    transform: [{ translateX: -1 }],
-  },
-  triangleText: {
-    fontFamily: 'Massallera',
-    position: 'absolute',
-    top: '40%',
-    left: '30%',
-    transform: [{ translateX: -50 }],
-    fontSize: 24,
-    color: 'black',
-  },
-  triangleBaseText: {
-    fontFamily: 'Massallera',
-    position: 'absolute',
-    top: '95%',
-    left: '65%',
-    transform: [{ translateX: -50 }],
-    fontSize: 24,
-    color: 'black',
-  },
-  triangleAlturaText: {
-    fontFamily: 'Massallera',
-    position: 'absolute',
-    top: '50%',
-    left: '70%',
-    transform: [{ translateX: -50 }],
-    fontSize: 24,
-    color: 'black',
-  },
-
-  piramideText: {
-    bottom: 10,
-    left: 50,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'black',
-  },
-  piramideredBar: {
-    position: 'absolute',
-    width: 2,
-    height: '55%',
-    backgroundColor: 'red',
-    top: 50,
-    left: '50%',
-    transform: [{ translateX: -1 }],
-  },
-  piramideText2: {
-    bottom: 160,
-    left: 220,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'blue',
-  },
-  piramideredBar2: {
-    position: 'absolute',
-    width: 2,
-    height: '35%',
-    backgroundColor: 'blue',
-    top: 80,
-    left: '60.5%',
-    transform: [{ translateX: -1 }, { rotate: '-20deg' }],
-},
-
-  piramideText3: {
-    bottom: 55,
-    left: 120,
-    fontSize: 24,
-    fontWeight: '600',
-    position: 'absolute',
-    fontFamily: 'massallera',
-    color: 'red',
-  },
-
-
-
-  title: {
-    top: 20,
-    paddingTop: 30,
-    paddingBottom: 10,
-    fontSize: 30,
-    fontWeight: '800',
-    marginBottom: 20,
-  },
-  text: {
-    padding: 30,
-    textAlign: 'justify',
-    fontSize: 20,
-    fontWeight: '600',
-    fontFamily: 'massallera',
-  },
-  micButton: {
-    top: 0,
-    bottom: 0,
-    marginTop: 10,
-  },
-});
 
 export default Geometria;

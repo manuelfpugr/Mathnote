@@ -597,6 +597,587 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     width: 200,
   },
+
+  container: {
+    flex: 1,
+    padding: 16,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    position: 'absolute',
+    marginLeft: 20,
+    bottom: 50,
+    justifyContent: 'center',
+    padding: 10,
+    borderRadius: 50,
+  
+  },
+  messageText: {
+    paddingBottom: 20,
+    textAlign: 'justify',
+    fontSize: 20,
+    fontWeight: '600',
+    fontFamily: 'massallera',
+  },
+  dimensionText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: 'black',
+    marginBottom: 0,
+    fontFamily: 'massallera',
+  },
+
+  squareText: {
+    bottom: 270,
+    left: 145,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+
+  cuboText: {
+    bottom: 120,
+    left: 8,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+
+  pentagonText: {
+    bottom: 80,
+    left: 10,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+  pentagonText2: {
+    bottom: 80,
+    left: 120,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+
+  pentagonBar: {
+    position: 'absolute',
+    width: 2,
+    height: '30%',
+    backgroundColor: 'red',
+    top: 153,
+    left: '50%',
+    transform: [{ translateX: -1 }],
+  },
+  hexagonBar: {
+    position: 'absolute',
+    width: 2,
+    height: '30%',
+    backgroundColor: 'red',
+    top: 158,
+    left: '50%',
+    transform: [{ translateX: -1 }],
+  },
+
+  hexagonText: {
+    bottom: 130,
+    left: 10,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+
+  romboText: {
+    bottom: 220,
+    left: 80,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+
+  diagonalMayorText: {
+    bottom: 110,
+    left: 160,
+    fontSize: 20,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'red',
+  },
+  diagonalMayorBar: {
+    position: 'absolute',
+    width: 2,
+    height: '54%',
+    backgroundColor: 'red',
+    top: 69,
+    left: '50%',
+    transform: [{ translateX: -1 }],
+  },
+
+  diagonalMenorText: {
+    bottom: 160,
+    left: 130,
+    fontSize: 20,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'blue',
+  },
+  diagonalMenorBar: {
+    position: 'absolute',
+    width: '39%',
+    height: 2,
+    backgroundColor: 'blue',
+    top: 150,
+    left: 22,
+    transform: [{ translateX: 70}],
+},
+
+  point: {
+    width: 10, // Ancho del punto
+    height: 10, // Alto del punto
+    borderRadius: 10, // Hace que el punto sea redondo
+    backgroundColor: 'black', // Color del punto
+    position: 'absolute', // Posicionamiento absoluto
+  },
+  point1: {
+    top: 146, // Posición del primer punto
+    left: 80,
+  },
+  point2: {
+    top: 146, // Posición del segundo punto
+    left: 210,
+  },
+
+
+
+ejeMayorText: {
+  bottom: 100,
+  left: 160,
+  fontSize: 20,
+  fontWeight: '600',
+  position: 'absolute',
+  fontFamily: 'massallera',
+  color: 'red',
+},
+ejeMayorBar: {
+  position: 'absolute',
+  width: '67%',
+  height: 2,
+  backgroundColor: 'red',
+  top: 150,
+  left: '17%',
+  transform: [{ translateX: -1 }],
+},
+ejeMenorText: {
+  bottom: 170,
+  left: 160,
+  fontSize: 20,
+  fontWeight: '600',
+  position: 'absolute',
+  fontFamily: 'massallera',
+  color: 'blue',
+},
+ejeMenorBar: {
+  position: 'absolute',
+  width: 2,
+  height: '52%',
+  backgroundColor: 'blue',
+  top: 70,
+  left: '50%',
+  transform: [{ translateX: -1 }],
+},
+distFocalText: {
+  bottom: 100,
+  left: 100,
+  fontSize: 20,
+  fontWeight: '600',
+  position: 'absolute',
+  fontFamily: 'massallera',
+  color: 'green',
+},
+distFocalBar: {
+  position: 'absolute',
+  width: '43%',
+  height: 3,
+  backgroundColor: 'green',
+  top: 150,
+  left: '30%',
+  transform: [{ translateX: -1 }],
+},
+  circleText: {
+    bottom: 100,
+    left: 135,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+
+  circleText2: {
+    bottom: 180,
+    left: 190,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+
+  esferaText: {
+    bottom: 125,
+    left: 100,
+    fontSize: 15,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'blue',
+  },
+
+  esferaBar: {
+    position: 'absolute',
+    width: '35%',
+    height: 2,
+    backgroundColor: 'blue',
+    top: 150,
+    left: '16%',
+  },
+
+  esferaBar2: {
+    position: 'absolute',
+    width: 2,
+    height: '17%',
+    backgroundColor: 'red',
+    top: 124,
+    left: '50%',
+  },
+
+  
+  esferaText2: {
+    bottom: 150,
+    left: 160,
+    fontSize: 15,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'red',
+  },
+
+  cilindroText: {
+    bottom: 70,
+    left: 120,
+    fontSize: 15,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'blue',
+  },
+
+  
+  cilindroText2: {
+    bottom: 220,
+    left: 120,
+    fontSize: 15,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'green',
+  },
+
+  cilindroText3: {
+    bottom: 130,
+    left: 160,
+    fontSize: 15,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'red',
+  },
+
+
+  cilindroBar: {
+    position: 'absolute',
+    width: '30%',
+    height: 2,
+    backgroundColor: 'blue',
+    top: 225,
+    left: '20%',
+  },
+
+  cilindroBar2: {
+    position: 'absolute',
+    width: '58%',
+    height: 2,
+    backgroundColor: 'green',
+    top: 75,
+    left: '21%',
+  },
+
+  cilindroBar3: {
+    position: 'absolute',
+    width: 2,
+    height: '50%',
+    backgroundColor: 'red',
+    top: 77,
+    left: '50%',
+  },
+
+  conoText: {
+    bottom: 70,
+    left: 120,
+    fontSize: 15,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'blue',
+  },
+
+  
+  conoText2: {
+    bottom: 47,
+    left: 160,
+    fontSize: 15,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'green',
+  },
+
+  conoText3: {
+    bottom: 130,
+    left: 160,
+    fontSize: 15,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'red',
+  },
+
+
+  conoBar: {
+    position: 'absolute',
+    width: '67%',
+    height: 2,
+    backgroundColor: 'blue',
+    top: 225,
+    left: '16%',
+  },
+
+  conoBar2: {
+    position: 'absolute',
+    width: 2,
+    height: '9%',
+    backgroundColor: 'green',
+    top: 225,
+    left: '50%',
+  },
+
+  conoBar3: {
+    position: 'absolute',
+    width: 2,
+    height: '55%',
+    backgroundColor: 'red',
+    top: 62,
+    left: '50%',
+  },
+
+
+
+  rectangleText: {
+    bottom: 220,
+    left: 165,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+
+  rectangleText2: {
+    bottom: 100,
+    left:10,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+  squareText2: {
+    top: 135,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+
+  circleBar: {
+    position: 'absolute',
+    height: 2,
+    width: '28%',
+    backgroundColor: 'blue',
+    top: '50%',
+    left: 47,
+    transform: [{ translateX: 32 }, { translateY: -1 }],
+  },
+
+  circleBar2: {
+    position: 'absolute',
+    height: '67%',
+    width: 2,
+    backgroundColor: 'red',
+    top: 50,
+    left: '50%',
+},
+
+  triangleContainer: {
+    position: 'relative',
+    width: 300,
+    height: 300,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  rectangleContainer: {
+    position: 'relative',
+    width: 360,
+    height: 300,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  circleContainer: {
+    position: 'relative',
+    width: 300,
+    height: 300,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  redBar: {
+    position: 'absolute',
+    width: 2,
+    height: '65%',
+    backgroundColor: 'red',
+    top: 58,
+    left: '50%',
+    transform: [{ translateX: -1 }],
+  },
+  triangleText: {
+    fontFamily: 'Massallera',
+    position: 'absolute',
+    top: '40%',
+    left: '30%',
+    transform: [{ translateX: -50 }],
+    fontSize: 24,
+    color: 'black',
+  },
+  triangleBaseText: {
+    fontFamily: 'Massallera',
+    position: 'absolute',
+    top: '95%',
+    left: '65%',
+    transform: [{ translateX: -50 }],
+    fontSize: 24,
+    color: 'black',
+  },
+  triangleAlturaText: {
+    fontFamily: 'Massallera',
+    position: 'absolute',
+    top: '50%',
+    left: '70%',
+    transform: [{ translateX: -50 }],
+    fontSize: 24,
+    color: 'black',
+  },
+
+  piramideText: {
+    bottom: 10,
+    left: 50,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'black',
+  },
+  piramideredBar: {
+    position: 'absolute',
+    width: 2,
+    height: '55%',
+    backgroundColor: 'red',
+    top: 50,
+    left: '50%',
+    transform: [{ translateX: -1 }],
+  },
+  piramideText2: {
+    bottom: 160,
+    left: 220,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'blue',
+  },
+  piramideredBar2: {
+    position: 'absolute',
+    width: 2,
+    height: '35%',
+    backgroundColor: 'blue',
+    top: 80,
+    left: '60.5%',
+    transform: [{ translateX: -1 }, { rotate: '-20deg' }],
+},
+
+  piramideText3: {
+    bottom: 55,
+    left: 120,
+    fontSize: 24,
+    fontWeight: '600',
+    position: 'absolute',
+    fontFamily: 'massallera',
+    color: 'red',
+  },
+
+
+
+  title: {
+    top: 20,
+    paddingTop: 30,
+    paddingBottom: 10,
+    fontSize: 30,
+    fontWeight: '800',
+    marginBottom: 20,
+  },
+  text: {
+    padding: 30,
+    textAlign: 'justify',
+    fontSize: 20,
+    fontWeight: '600',
+    fontFamily: 'massallera',
+  },
+  micButton: {
+    top: 0,
+    bottom: 0,
+    marginTop: 0,
+  },
+
+  viewShot: {
+    flex: 1, // Ocupa todo el espacio disponible
+    width: '100%', // Ancho del contenedor
+    backgroundColor: 'transparent', // Fondo tr
+  },
 });
 
 export default styles;
