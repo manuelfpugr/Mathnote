@@ -16,7 +16,18 @@ const ImageDetail = () => {
 
   const handleModify = () => {
     console.log("Modificando operación: ", operation);
-    navigation.navigate('Aritmetica', { operation });
+  
+    // Lista de figuras geométricas
+    const geometricFigures = [
+      'angulo', 'cono', 'cuadrado', 'triangulo', 'rectangulo', 'circulo', 'pentagono', 
+      'hexagono', 'rombo', 'elipse', 'esfera', 'piramide', 'cubo', 'cilindro'
+    ];
+    // Verificar si la operación es una figura geométrica
+    if (geometricFigures.includes(operation.operacion)) {
+      navigation.navigate('Geometria', { operation });
+    } else {
+      navigation.navigate('Aritmetica', { operation });
+    }
   };
 
   return (
