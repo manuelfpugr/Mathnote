@@ -23,7 +23,6 @@ const Aritmetica = () => {
   // Mensajes de bienvenida y navegación
   const [bienvenida, setBienvenida] = useState("¡Bienvenido a Aritmética!");
   const [navegacion, setNavegacion] = useState("¿Que operación quiere realizar?");
-  const [realizar, setRealizar] = useState("Vamos a realizar la operación");
   const [realizarDiv, setRealizarDiv] = useState("Vamos a realizar la división");
   // Grabación de audio
   const [recording, setRecording] = useState(null);
@@ -260,7 +259,7 @@ const Aritmetica = () => {
     }
     
   }
- else if(division.length > 0 && ( divisionProc1 || (division.length > 0 && resultAcarreo) || resultMult || divisionProcAcarreo || div || divisionProc2 || divisionProc3 || procedimientoBajarNum || procedimientoResta || procedimientoResta2 || coma) ){
+ else if((div || division.length > 0) && ( divisionProc1 || (division.length > 0 && resultAcarreo) || resultMult || divisionProcAcarreo || div || divisionProc2 || divisionProc3 || procedimientoBajarNum || procedimientoResta || procedimientoResta2 || coma) ){
  console.log("AQUI");
   divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajarNum, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, procedimientoDivLinea3, cociente);
   }else if(filasCompletas && division.length === 0){
@@ -654,13 +653,25 @@ const Aritmetica = () => {
               setProcedimientoRestar(prevResultado => [ultimoNumeroInt, ...prevResultado]);
             }else if (cociente.length >= 2 && cociente.length < 3)  {
               console.log("Resta de la división 2");
+              if(cociente.includes(",")){
+                setProcedimientoRestar(prevResultado => [0, ...prevResultado]);
+              }else{
               setProcedimientoRestar2(prevResultado => [ultimoNumeroInt, ...prevResultado]);
+              }
             }else if (cociente.length >= 3 && cociente.length < 4) {
               console.log("Resta de la división 3");
+              if(cociente.includes(",")){
+                setProcedimientoRestar2(prevResultado => [0, ...prevResultado]);
+              }else{
               setProcedimientoRestar3(prevResultado => [ultimoNumeroInt, ...prevResultado]);
+              }
             }else if (cociente.length >= 4 && cociente.length < 5) {
               console.log("Resta de la división 4");
+              if(cociente.includes(",")){
+                setProcedimientoRestar3(prevResultado => [0, ...prevResultado]);
+              }else{
               setProcedimientoRestar4(prevResultado => [ultimoNumeroInt, ...prevResultado]);
+              }
             }
             } else {
               console.error("procedimientoResta no es un array o está vacío");
@@ -836,7 +847,7 @@ const Aritmetica = () => {
             console.log("Cociente", cociente.length);
             setCociente(prevResultado => [...prevResultado, resultMult[3]]);
             console.log("Cociente numero Mult Segunda Linea", resultMult[3]);
-            setProcedimientoDivLinea2(prevResultado => [resultMult[3], ...prevResultado]);
+            setProcedimientoDiv(prevResultado => [resultMult[3], ...prevResultado]);
           }else if (cociente.length === 1 && !cociente.includes(',')) {
             console.log("Cociente numero Mult Segunda Linea Pr", resultMult[3]);
             setCociente(prevResultado => [...prevResultado, resultMult[3]]);
@@ -847,11 +858,11 @@ const Aritmetica = () => {
         }
         else if (cociente.length > 2 && cociente.length < 4) {
           console.log("ENTRA 3", cociente.length);
-          if (cociente.includes(',') && cociente.length === 2) {
+          if (cociente.includes(',') && cociente.length === 3) {
             console.log("Cociente", cociente.length);
-            setCociente(prevResultado => [...prevResultado, resultMult[3]]);
+            
             console.log("Cociente numero Mult Tres Linea", resultMult[3]);
-            setProcedimientoDivLinea3(prevResultado => [resultMult[3], ...prevResultado]);
+            setProcedimientoDivLinea2(prevResultado => [resultMult[3], ...prevResultado]);
           }else if (cociente.length === 1 && !cociente.includes(',')) {
             console.log("Cociente numero Mult Tercera Linea Pr", resultMult[3]);
             setCociente(prevResultado => [...prevResultado, resultMult[3]]);
@@ -862,11 +873,11 @@ const Aritmetica = () => {
         }
         else if (cociente.length > 3 && cociente.length < 5) {
           console.log("ENTRA 4", cociente.length);
-          if (cociente.includes(',') && cociente.length === 2) {
+          if (cociente.includes(',') && cociente.length === 4) {
             console.log("Cociente", cociente.length);
-            setCociente(prevResultado => [...prevResultado, resultMult[3]]);
+            
             console.log("Cociente numero Mult Cuarta Linea", resultMult[3]);
-            setProcedimientoDivLinea4(prevResultado => [resultMult[3], ...prevResultado]);
+            setProcedimientoDivLinea3(prevResultado => [resultMult[3], ...prevResultado]);
           }else if (cociente.length === 1 && !cociente.includes(',')) {
             console.log("Cociente numero Mult Cuarta Linea Pr", resultMult[3]);
             setCociente(prevResultado => [...prevResultado, resultMult[3]]);
@@ -966,7 +977,7 @@ const Aritmetica = () => {
       <View style={styles.operationContainer}>
         
       {division && (
-        <Animated.Text style={[styles.messageText, { opacity }]}>
+        <Animated.Text style={[styles.messageText, { opacity: 0 }]}>
           {realizarDiv}
         </Animated.Text>
       )}
@@ -1015,26 +1026,28 @@ const Aritmetica = () => {
       )}
 
       {procedimientoBajar && (
-        <Text style={[
-        dividendo.length === 2 && styles.procedimientoBajar2Dig, 
-        dividendo.length === 3 && styles.procedimientoBajar3Dig,
-        dividendo.length === 4 && styles.procedimientoBajar4Dig,
-        dividendo.length === 5 && styles.procedimientoBajar5Dig,
-        
-        ]}>
+        <Text
+          style={[
+            dividendo.length === 2 && styles.procedimientoBajar2Dig,
+            dividendo.length === 3 && styles.procedimientoBajar3Dig,
+            dividendo.length === 4 && styles.procedimientoBajar4Dig,
+            dividendo.length === 5 && styles.procedimientoBajar5Dig,
+          ]}
+         >
           {procedimientoBajar}
         </Text>
       )}
 
       {(procedimientoBajar.length > 0 || procedimientoRestar.length > 0) && (
-        <View style={[
-          dividendo.length === 2 && styles.divBarBajar2Dig, 
-          dividendo.length === 3 && styles.divBarBajar3Dig,
-          dividendo.length === 4 && styles.divBarBajar4Dig,
-          dividendo.length === 5 && styles.divBarBajar5Dig
-        ]} />
+        <View
+          style={[
+            dividendo.length === 2 && styles.divBarBajar2Dig,
+            dividendo.length === 3 && styles.divBarBajar3Dig,
+            dividendo.length === 4 && styles.divBarBajar4Dig,
+            dividendo.length === 5 && styles.divBarBajar5Dig,
+          ]}
+        />
       )}
-
       {procedimientoRestar.length > 0 && (
         <Text style={[
           styles.procedimientoRestar, 
@@ -1100,12 +1113,14 @@ const Aritmetica = () => {
 
     {procedimientoRestar3.length > 0 && (
         <View style={[styles.divBarBajar3, 
+          dividendo.length == 3 && styles.divBarBajar3_3Dig,
           dividendo.length == 4 && styles.divBarBajar3_4Dig,
           dividendo.length == 5 && styles.divBarBajar3_5Dig]} />
       )}
 
       {procedimientoRestar3.length > 0 && (
         <Text style={[styles.procedimientoRestar3,  
+          dividendo.length == 4 && styles.procedimientoRestar3_4Dig,
         dividendo.length == 4 && styles.procedimientoRestar3_4Dig,
         dividendo.length == 5 && styles.procedimientoRestar3_5Dig]}>
           {procedimientoRestar3}
@@ -1153,11 +1168,6 @@ const Aritmetica = () => {
     return (
       
       <View style={styles.operationContainer}>
-      {operacion && (
-        <Animated.Text style={[styles.messageText, { opacity }]}>
-          {realizar}
-        </Animated.Text>
-      )}
       <Text style={[
         styles.llevada2, 
         digitoMayor.length === 2 && styles.llevada2,
@@ -1201,11 +1211,7 @@ const Aritmetica = () => {
 return (
     <View style={styles.container}>
     <Text style={[styles.text, styles.title]}>Aritmética</Text>
-    {showBienvenida && !hasShownBienvenida && (
-      <Animated.Text style={[styles.text, { opacity }]} onLayout={() => setHasShownBienvenida(false)}>
-        {bienvenida}
-      </Animated.Text>
-    )}
+    
     {showNavegacion && !hasShownNavegacion && (
       <Animated.Text style={[styles.text, { opacity }]} onLayout={() => setHasShownNavegacion(false)}>
         {navegacion}

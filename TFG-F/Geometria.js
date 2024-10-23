@@ -245,11 +245,11 @@ const Geometria = () => {
             }
             if (dimensionType === 'diagonal mayor') {
               setDiagonalMayor(dimensionValue);
-              console.log("Diagonal 1: " + diagonal2);
+              console.log("Diagonal 1: " + diagonalMayor);
             }
             else if (dimensionType === 'diagonal menor') {
               setDiagonalMenor(dimensionValue);
-              console.log("Diagonal 2: " + diagonal2);
+              console.log("Diagonal 2: " + diagonalMenor);
             }
             else if (dimensionType === 'perimetro') {
               setPerimetro(dimensionValue);

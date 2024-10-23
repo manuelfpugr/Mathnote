@@ -19,7 +19,7 @@ const loadFonts = () => {
 const Home = () => {
   const navigation = useNavigation();
   const [bienvenida, setBienvenida] = useState("¡Bienvenido a Mathnote!");
-  const [navegacion, setNavegacion] = useState("¿Hacia dónde le gustaría ir?");
+  const [navegacion, setNavegacion] = useState("¿Hacia dónde vamos?");
   const [opacity] = useState(new Animated.Value(1));
   const [recording, setRecording] = useState(null);
   const [message, setMessage] = useState('');
@@ -42,13 +42,13 @@ const Home = () => {
           setShowNavegacion(true);
           Animated.timing(opacity, {
             toValue: 1,
-            duration: 2000,
+            duration: 1000,
             useNativeDriver: true,
           }).start();
-        }, 2000); // Espera 2 segundos antes de mostrar el mensaje de navegación
+        }, 1000); // Espera 2 segundos antes de mostrar el mensaje de navegación
         return () => clearTimeout(timer2);
       });
-    }, 3000);
+    }, 1000);
 
     return () => clearTimeout(timer1);
   }, []);
@@ -327,17 +327,21 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-    <Text style={[styles.text, styles.title]}>Mathnote</Text>
+      <Text style={[styles.text, styles.title]}>Mathnote</Text>
+      <View style={styles.fixedSizeContainer}>
     {showBienvenida && !hasShownBienvenida && (
       <Animated.Text style={[styles.text, { opacity }]} onLayout={() => setHasShownBienvenida(false)}>
         {bienvenida}
       </Animated.Text>
     )}
+    </View>
+    <View style={styles.fixedSizeContainer}>
     {showNavegacion && !hasShownNavegacion && (
       <Animated.Text style={[styles.text, { opacity }]} onLayout={() => setHasShownNavegacion(false)}>
         {navegacion}
       </Animated.Text>
     )}
+     </View>
     {message && <Text style={styles.text}>{message}</Text>}
   
     <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Aritmetica')}>
@@ -367,6 +371,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
+  fixedSizeContainer: {
+    height: 100, // Ajusta este valor según el tamaño de tus textos animados
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   text: {
     padding: 30,
     textAlign: 'justify',
@@ -387,6 +396,8 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
+    
+    position: 'relative',
     padding: 15,
     borderRadius: 10,
     backgroundColor: 'black',

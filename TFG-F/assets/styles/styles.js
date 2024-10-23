@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
   containerCaptura: {
     flex: 1,
     justifyContent: 'flex-start',
+
     alignItems: 'center',
   },
   messageText: {
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
   },
   procedimientoDivLinea2_4Dig: {
     top: 90,
-    right: 105,
+    right: 100,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -158,13 +159,13 @@ const styles = StyleSheet.create({
   },
 
   procedimientoDivLinea3_3Dig: {
-    top: 120,
+    top: 65,
     right: 82,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoDivLinea3_4Dig: {
-    top: 120,
+    top: 80,
     right: 105,
     fontFamily: 'massallera',
     fontSize: 30,
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
   procedimientoBajar2_4Dig: {
     top: 250,
     position: 'absolute',
-    left:80,
+    left:110,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
   procedimientoRestar4Dig: {
     top: 165,
     position: 'absolute',
-    left: 30,
+    left: 35,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -294,21 +295,21 @@ const styles = StyleSheet.create({
   },
   procedimientoRestar2_3Dig: {
     top:90,
-    right: 60 ,
+    right: 80 ,
     fontFamily: 'massallera',
     fontSize: 30,
   },
 
   procedimientoRestar2_4Dig: {
     top: 91,
-    right: 59,
+    right: 100,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   
   procedimientoRestar2_5Dig: {
     top: 91,
-    right: 130,
+    right: 100,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -397,6 +398,13 @@ const styles = StyleSheet.create({
     top: 85,
     height: 4,
     right:120,
+    backgroundColor: 'black',
+    width: 75,
+  },
+    divBarBajar3_3Dig: {
+    top: 40,
+    height: 4,
+    right:80,
     backgroundColor: 'black',
     width: 75,
   },
@@ -1150,8 +1158,6 @@ distFocalBar: {
     color: 'red',
   },
 
-
-
   title: {
     top: 20,
     paddingTop: 30,
@@ -1160,6 +1166,7 @@ distFocalBar: {
     fontWeight: '800',
     marginBottom: 20,
   },
+
   text: {
     padding: 30,
     textAlign: 'justify',
