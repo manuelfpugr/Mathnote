@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import styles2 from './assets/styles/styles.js';
 import { getAllOperations } from './db/database'; // Asegúrate de que la ruta sea correcta
 
 const Actividades = () => {
+  const [bienvenida, setBienvenida] = useState("¡Bienvenido a Actividades!");
+  const opacity = React.useRef(new Animated.Value(1)).current;
+  const [showBienvenida, setShowBienvenida] = useState(true);
+  const [hasShownBienvenida, setHasShownBienvenida] = useState(false);
   const [recording, setRecording] = useState(false);
   const [operations, setOperations] = useState([]);
   const [message, setMessage] = useState('');
@@ -25,6 +30,32 @@ const Actividades = () => {
       fetchOperations();
     }, [])
   );
+
+  React.useEffect(() => {
+    if (!hasShownBienvenida) {
+      const timer1 = setTimeout(() => {
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }).start(() => {
+          setShowBienvenida(false);
+          setHasShownBienvenida(true);
+          const timer2 = setTimeout(() => {
+            Animated.timing(opacity, {
+              toValue: 1,
+              duration: 2000,
+              useNativeDriver: true,
+            }).start();
+          }, 2000); // Espera 2 segundos antes de mostrar el mensaje de navegación
+          return () => clearTimeout(timer2);
+        });
+      }, 3000);
+  
+      return () => clearTimeout(timer1);
+    }
+  }, [hasShownBienvenida]);
+  
 
   const startRecording = async () => {
     try {
@@ -98,6 +129,12 @@ const Actividades = () => {
   return (
     <View style={styles.container}>
       <Text style={[styles.text, styles.title]}>Actividades</Text>
+
+      {showBienvenida && !hasShownBienvenida && (
+      <Text style={[styles2.actividadestext]}>
+        {bienvenida}
+      </Text>
+    )}
       <TouchableOpacity style={styles.micButton} onPress={recording ? stopRecording : startRecording}>
         <Icon name={recording ? 'stop' : 'microphone'} size={60} color={recording ? 'red' : 'black'} />
       </TouchableOpacity>

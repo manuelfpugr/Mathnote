@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
   containerCaptura: {
     flex: 1,
     justifyContent: 'flex-start',
+
     alignItems: 'center',
   },
   messageText: {
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   llevada2: {
-    color: 'blue',
+    color: 'red',
     right: 170,
     bottom: 0,
     fontSize: 30,
@@ -48,7 +49,25 @@ const styles = StyleSheet.create({
   },
   llevada3: {
     color: 'red',
-    right: 160,
+    right: 120,
+    bottom: 0,
+    fontSize: 30,
+    fontFamily: 'massallera',
+    flexDirection: 'row-reverse',
+    alignSelf: 'flex-end',
+  },
+  llevada3acarreo: {
+    color: 'red',
+    right: 155,
+    bottom: 0,
+    fontSize: 30,
+    fontFamily: 'massallera',
+    flexDirection: 'row-reverse',
+    alignSelf: 'flex-end',
+  },
+  llevada3acarreo2: {
+    color: 'red',
+    right: 150,
     bottom: 0,
     fontSize: 30,
     fontFamily: 'massallera',
@@ -56,6 +75,24 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   llevada4: {
+    color: 'red',
+    right: 120,
+    bottom: 0,
+    fontSize: 30,
+    fontFamily: 'massallera',
+    flexDirection: 'row-reverse',
+    alignSelf: 'flex-end',
+  },
+  llevada4acarreo1: {
+    color: 'red',
+    right: 150,
+    bottom: 0,
+    fontSize: 30,
+    fontFamily: 'massallera',
+    flexDirection: 'row-reverse',
+    alignSelf: 'flex-end',
+  },
+  llevada4acarreo2: {
     color: 'red',
     right: 150,
     bottom: 0,
@@ -65,6 +102,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   llevadaDiv: {
+    bottom: 50,
     color: 'red',
     right: 112,
     fontSize: 12,
@@ -82,6 +120,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   operationContainer: {
+    padding: 40,
     alignItems: 'center',
   },
   row: {
@@ -104,6 +143,27 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     width: 30,
   },
+
+  plusSign: {
+    bottom: 170,
+    height: 3,
+    right: 120,
+    paddingLeft: 20,
+    backgroundColor: 'black',
+    width: 20,
+    marginVertical: 10,
+  },
+
+  plusSign2: {
+    bottom: 193,
+    height: 3,
+    right: 120,
+    paddingLeft: 20,
+    transform: 'rotate(90deg)',
+    backgroundColor: 'black',
+    width: 20,
+    marginVertical: 10,
+  },
   divisorText: {
     top: 80,
     position: 'absolute',
@@ -119,7 +179,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   dividendoText: {
-    top: 35,
+    bottom: 0,
     position: 'absolute',
     right: 40,
     fontWeight: 'bold',
@@ -127,7 +187,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   procedimientoDiv: {
-    top: 55,
+    top: 0,
     right: 108,
     fontFamily: 'massallera',
     fontSize: 30,
@@ -139,38 +199,38 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   procedimientoDivLinea2_3Dig: {
-    top: 90,
+    top: 40,
     right: 82,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoDivLinea2_4Dig: {
-    top: 90,
-    right: 105,
+    top: 40,
+    right: 110,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoDivLinea2_5Dig: {
-    top: 90,
+    top: 40,
     right: 125,
     fontFamily: 'massallera',
     fontSize: 30,
   },
 
   procedimientoDivLinea3_3Dig: {
-    top: 120,
+    top: 28,
     right: 82,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoDivLinea3_4Dig: {
-    top: 120,
+    top: 40,
     right: 105,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoDivLinea3_5Dig: {
-    top: 85,
+    top: 28,
     right: 105,
     fontFamily: 'massallera',
     fontSize: 30,
@@ -203,44 +263,44 @@ const styles = StyleSheet.create({
     right: 125,
   },
   procedimientoBajar2Dig: {
-    top: 166,
+    top: 185,
     position: 'absolute',
     left: 110,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoBajar3Dig: {
-    top: 166,
+    top: 185,
     position: 'absolute',
-    left: 103,
+    left: 109,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoBajar4Dig: {
-    top: 166,
+    top: 185,
     position: 'absolute',
     left: 83,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoBajar5Dig: {
-    top: 165,
+    top: 185,
     position: 'absolute',
     left: 63,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoBajar2_4Dig: {
-    top: 250,
+    top: 280,
     position: 'absolute',
-    left:80,
+    left:110,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoBajar2_5Dig: {
-    top: 251,
+    top: 280,
     position: 'absolute',
-    left: 85,
+    left: 105,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -266,21 +326,21 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   procedimientoRestar3Dig: {
-    top: 165,
+    top: 185,
     position: 'absolute',
     left: 60,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoRestar4Dig: {
-    top: 165,
+    top: 185,
     position: 'absolute',
-    left: 30,
+    left: 35,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoRestar5Dig: {
-    top: 165,
+    top: 185,
     position: 'absolute',
     left:15,
     fontFamily: 'massallera',
@@ -293,35 +353,43 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   procedimientoRestar2_3Dig: {
-    top:90,
-    right: 60 ,
+    top:50,
+    right: 80 ,
     fontFamily: 'massallera',
     fontSize: 30,
   },
 
   procedimientoRestar2_4Dig: {
-    top: 91,
-    right: 59,
+    top: 50,
+    right: 100,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   
   procedimientoRestar2_5Dig: {
-    top: 91,
-    right: 130,
+    top: 50,
+    right: 100,
     fontFamily: 'massallera',
     fontSize: 30,
   },
   procedimientoRestar3: {
     top: 50,
-    right: 90,
+    right: 80,
     fontFamily: 'massallera',
     fontSize: 30,
   },
 
-  procedimientoRestar3_4Dig: {
-    top: 91,
+  procedimientoRestar3_3Dig: {
+    top: 30,
     right: 59,
+    fontFamily: 'massallera',
+    fontSize: 30,
+  },
+  
+
+  procedimientoRestar3_4Dig: {
+    top: 40,
+    right: 89,
     fontFamily: 'massallera',
     fontSize: 30,
   },
@@ -341,7 +409,7 @@ const styles = StyleSheet.create({
   },
 
   divBarBajar2Dig: {
-    top: 155,
+    top: 175,
     height: 4,
     position: 'absolute',
     left: 80,
@@ -349,7 +417,7 @@ const styles = StyleSheet.create({
     width: 50,
   },
   divBarBajar3Dig: {
-    top: 155,
+    top: 175,
     height: 4,
     position: 'absolute',
     left: 60,
@@ -357,7 +425,7 @@ const styles = StyleSheet.create({
     width: 50,
   },
   divBarBajar4Dig: {
-    top: 155,
+    top: 175,
     height: 4,
     position: 'absolute',
     left: 30,
@@ -365,7 +433,7 @@ const styles = StyleSheet.create({
     width: 50,
   },
   divBarBajar5Dig: {
-    top: 155,
+    top: 175,
     height: 4,
     position: 'absolute',
     left: 10,
@@ -380,29 +448,36 @@ const styles = StyleSheet.create({
     width: 75,
   },
   divBarBajar2_3Dig: {
-    top: 85,
+    top: 40,
     height: 4,
     right:80,
     backgroundColor: 'black',
     width: 75,
   },
   divBarBajar2_4Dig: {
-    top: 85,
+    top:  40,
     height: 4,
     right:110,
     backgroundColor: 'black',
     width: 75,
   },
   divBarBajar2_5Dig: {
-    top: 85,
+    top:  40,
     height: 4,
     right:120,
     backgroundColor: 'black',
     width: 75,
   },
+    divBarBajar3_3Dig: {
+    top: 20,
+    height: 4,
+    right:80,
+    backgroundColor: 'black',
+    width: 75,
+  },
 
   divBarBajar3_4Dig: {
-    top: 75,
+    top: 35,
     height: 4,
     right:110,
     backgroundColor: 'black',
@@ -425,7 +500,7 @@ const styles = StyleSheet.create({
   },
 
   dividendo2Dig1: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '5%',
     right:70,
@@ -433,7 +508,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   dividendo2Dig2: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '10%',
     right: 50,
@@ -442,7 +517,7 @@ const styles = StyleSheet.create({
   },
  
   dividendo3Dig1: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '5%',
     right: 130,
@@ -450,7 +525,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   dividendo3Dig2: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '10%',
     right: 78,
@@ -458,7 +533,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   dividendo3Dig3: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '15%',
     right: 55,
@@ -467,7 +542,7 @@ const styles = StyleSheet.create({
   },
   
   dividendo4Dig1: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '5%',
     right: 125,
@@ -475,7 +550,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   dividendo4Dig2: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '10%',
     right: 105,
@@ -483,7 +558,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   dividendo4Dig3: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '15%',
     right: 80,
@@ -491,7 +566,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   dividendo4Dig4: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '24%',
     right: 50,
@@ -499,7 +574,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   dividendo5Dig1: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '5%',
     right: 145,
@@ -507,7 +582,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   dividendo5Dig2: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '10%',
     right: 120,
@@ -515,7 +590,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   dividendo5Dig3: {
-    top: 30,
+    bottom: 50,
     position: 'absolute',
     width: '15%',
     right: 100,
@@ -590,7 +665,7 @@ const styles = StyleSheet.create({
   },
   result4: {
     height: 60,
-    bottom: 60,
+    bottom: 65,
     fontSize: 40,
     fontWeight: 'bold',
     fontFamily: 'massallera',
@@ -1150,8 +1225,6 @@ distFocalBar: {
     color: 'red',
   },
 
-
-
   title: {
     top: 20,
     paddingTop: 30,
@@ -1160,6 +1233,7 @@ distFocalBar: {
     fontWeight: '800',
     marginBottom: 20,
   },
+
   text: {
     padding: 30,
     textAlign: 'justify',
@@ -1167,6 +1241,25 @@ distFocalBar: {
     fontWeight: '600',
     fontFamily: 'massallera',
   },
+
+  aritmeticatext: {
+    padding: 30,
+    textAlign: 'justify',
+    fontSize: 18,
+    fontWeight: '600',
+    fontFamily: 'massallera',
+
+  },
+
+  actividadestext: {
+    padding: 30,
+    textAlign: 'justify',
+    fontSize: 17,
+    fontWeight: '600',
+    fontFamily: 'massallera',
+
+  },
+
   micButton: {
     top: 0,
     bottom: 0,

@@ -9,7 +9,6 @@ import * as FileSystem from 'expo-file-system';
  * @param {Object} operationData - Los datos de la operación (id, tipo, detalles).
  */
 export const captureAndSaveOperation = async (viewShotRef, operationData) => {
-  console.log("CAPTURANDO Y GUARDANDO OPERACIÓN");
   try {
     // Verificar que viewShotRef.current no sea null
     if (!viewShotRef.current) {
@@ -18,7 +17,6 @@ export const captureAndSaveOperation = async (viewShotRef, operationData) => {
 
     // 1. Capturar la parte de la pantalla
     const uri = await viewShotRef.current.capture();
-    console.log('Captura de pantalla realizada:', uri);
 
     // 2. Agregar la URI de la captura a los datos de la operación
     const operation = {
@@ -42,7 +40,6 @@ const saveOperation = async (operation) => {
   try {
     const jsonValue = JSON.stringify(operation);
     await AsyncStorage.setItem(`@operation_${operation.id}`, jsonValue);
-    console.log('Operación guardada en la base de datos');
   } catch (error) {
     console.error('Error al guardar la operación en la base de datos', error);
   }
@@ -96,7 +93,6 @@ export const getAllOperationIds = async () => {
 export const deleteOperation = async (id) => {
   try {
     await AsyncStorage.removeItem(`@operation_${id}`);
-    console.log(`Operación con ID ${id} eliminada de la base de datos`);
   } catch (error) {
     console.error('Error al eliminar la operación de la base de datos', error);
   }

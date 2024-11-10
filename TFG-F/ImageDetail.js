@@ -9,13 +9,11 @@ const ImageDetail = () => {
   const { operation } = route.params;
 
   const handleDelete = async () => {
-    console.log("Borrando operación: ", operation.id);
     await deleteOperation(operation.id);
     navigation.navigate('Actividades');
   };
 
   const handleModify = () => {
-    console.log("Modificando operación: ", operation);
   
     // Lista de figuras geométricas
     const geometricFigures = [
