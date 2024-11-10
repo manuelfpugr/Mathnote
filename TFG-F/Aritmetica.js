@@ -289,14 +289,14 @@ const Aritmetica = () => {
      adicionSumaResta(match);
   
     }else if (operacion === true && !matchAccarreo && !guardar && multiplicador.length === 0 && multiplicando.length === 0) {
+      console.log("ttt");
       operacionSumaResta(text);
     }else if(matchAccarreo){
       funcionAcarreo(matchAccarreo, division);
 
     }
-   
-     else if(sumas.length === 0 && division.length === 0 && restas.length === 0 && multiplicacion.length === 0){
-
+    else{
+      setMessage("Disculpa, no te entendí. ¿Puedes repetir?");
     }
   };
 
@@ -432,11 +432,44 @@ const Aritmetica = () => {
   }
   // Operacion Suma y Resta
   function operacionSumaResta(text) {
+
+    
       // Convertir el texto a minúsculas, eliminar cualquier punto o coma al final y recortar espacios en blanco
+      
+     
       const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
+      const regexAcarreo = lowerText.match(/(\d+)\s*más\s*(\d+\s*más\s*)*(\d+)\s*(igual\s*a|es)?\s*(\d+)\s*y\s*(\d+)/);
+
+      const multipleSum = regexUtils.matchMultipleSum(lowerText);
+      
+      const singleDigitMatch = lowerText.match(/(?<!\b(más|es|igual|y)\s)\b([0-9]|cero|una|zero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\b(?!\s\b(más|es|igual|y))/);
+
+      if (singleDigitMatch && !multipleSum && !regexAcarreo) {
+        const singleDigit = numberWords[singleDigitMatch[0]] !== undefined ? numberWords[singleDigitMatch[0]] : parseInt(singleDigitMatch[0], 10);
+        setResultado(prevResultado => [singleDigit, ...prevResultado]);
+        console.log('Número capturado:', singleDigit);
+        return; // Salir de la función si se encuentra un número de un solo dígito o palabra que representa un número
+      }
       
       console.log('Texto procesado:', lowerText, numeros, digitoMayor.length, resultado.length);
-      const multipleSum = regexUtils.matchMultipleSum(lowerText);
+
+      if(regexAcarreo){
+        let regxNumber =  Number(regexAcarreo[5])+  Number(regexAcarreo[6]);
+        console.log(regexAcarreo, regxNumber);
+        {
+          if(digitoMayor.length === 4 && resultado.length < 3 && regxNumber > 10){
+            regxNumber = regxNumber % 10;
+          }else if(digitoMayor.length === 3 && resultado.length < 2 && regxNumber > 10){
+            regxNumber = regxNumber% 10;
+         }else if(digitoMayor.length === 2 && resultado.length < 1 && regxNumber> 10){
+          regxNumber = regxNumber % 10;
+         }
+          console.log('Texto procesado Acarreo:', regexAcarreo[3]);
+          setResultado(prevResultado => [regxNumber, ...prevResultado]);
+        }
+        return;
+      }
+      
 
       if(multipleSum && multipleSum.length > 0)
       {
@@ -455,6 +488,10 @@ const Aritmetica = () => {
   function funcionAcarreo(matchAccarreo, division) {
     console.log('Texto procesado:', matchAccarreo);
         const carryNumber = [matchAccarreo[2]];
+        if(operacion)
+        {
+          console.log("SUMA");
+        }
         console.log('Número de acarreo:', carryNumber);
         const lowerText = matchAccarreo[2].toLowerCase().replace(/[.,]$/, '').trim();
         console.log('Texto procesado:', lowerText);
@@ -470,6 +507,7 @@ const Aritmetica = () => {
           console.log('Acarreo:', accarreo);
         }
   }
+  
   // ---------------------------------------------------------------------------------------------------------------------- //
   // Métodos para la Multiplicación
     // Procesado de las filas
@@ -573,14 +611,26 @@ const Aritmetica = () => {
       console.log("Suma de multiplicación");
           const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
           console.log('Texto procesado:', lowerText);
+          const regexAcarreo = lowerText.match(/(\d+)\s*(más|y)?\s*(\d+)?/g);
           const regexOperacion = lowerText.match(/^\s*(\d+)\s*(?:\+|mas|más)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*$/i);
           const regexNumerico = lowerText.match(/^(1[0-8]|[0-9])\.?$/);
           const regexPalabras = lowerText.match(/^(cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciséis|diecisiete|dieciocho)\.?$/i);
-
+        
+          if(regexAcarreo){
+            console.log('Expresión Acarreo:', regexAcarreo[2]);
+            
+            if(regexAcarreo[2] >= 10 && resultado4.length <= 6){
+              regexAcarreo[2] = regexAcarreo[2] % 10;
+            }
+            setResultado4(prevResultado => [regexAcarreo[2], ...prevResultado]);
+        }
           if(regexOperacion){
-            const result = parseInt(regexOperacion[3], 10);
+             result = parseInt(regexOperacion[3], 10);
 
-            console.log('Expresión:', result);
+            console.log('Expresión:', result, resultado4.length);
+            if(result >= 10 && resultado4.length <= 6){
+              result = result % 10;
+            }
             setResultado4(prevResultado => [result, ...prevResultado]);
           }
           else if (regexNumerico) {
@@ -654,21 +704,21 @@ const Aritmetica = () => {
             }else if (cociente.length >= 2 && cociente.length < 3)  {
               console.log("Resta de la división 2");
               if(cociente.includes(",")){
-                setProcedimientoRestar(prevResultado => [0, ...prevResultado]);
+                setProcedimientoRestar(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }else{
               setProcedimientoRestar2(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }
             }else if (cociente.length >= 3 && cociente.length < 4) {
               console.log("Resta de la división 3");
               if(cociente.includes(",")){
-                setProcedimientoRestar2(prevResultado => [0, ...prevResultado]);
+                setProcedimientoRestar2(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }else{
               setProcedimientoRestar3(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }
             }else if (cociente.length >= 4 && cociente.length < 5) {
               console.log("Resta de la división 4");
               if(cociente.includes(",")){
-                setProcedimientoRestar3(prevResultado => [0, ...prevResultado]);
+                setProcedimientoRestar3(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }else{
               setProcedimientoRestar4(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }
@@ -746,8 +796,7 @@ const Aritmetica = () => {
       }
     }
 
-    function divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajar, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, cociente) {
-      console.log("Falla aqui");     
+    function divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajar, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, cociente) {   
       if (division && division.length === 0) {
         let divMod = normalizeNumber(div);
         console.log("Division 2", divMod, division, resultMult);    
@@ -1120,6 +1169,7 @@ const Aritmetica = () => {
 
       {procedimientoRestar3.length > 0 && (
         <Text style={[styles.procedimientoRestar3,  
+          dividendo.length == 3 && styles.procedimientoRestar3_3Dig,
           dividendo.length == 4 && styles.procedimientoRestar3_4Dig,
         dividendo.length == 4 && styles.procedimientoRestar3_4Dig,
         dividendo.length == 5 && styles.procedimientoRestar3_5Dig]}>
@@ -1172,7 +1222,11 @@ const Aritmetica = () => {
         styles.llevada2, 
         digitoMayor.length === 2 && styles.llevada2,
         digitoMayor.length === 3 && styles.llevada3,
-        digitoMayor.length === 4 && styles.llevada4
+        digitoMayor.length === 3 && resultado.length == 2 && accarreo == 0 && styles.llevada3acarreo,
+        digitoMayor.length === 3 && resultado.length >= 3 && accarreo == 0 && styles.llevada3acarreo2,
+        digitoMayor.length === 4 && styles.llevada4,
+        digitoMayor.length === 4 && resultado.length == 2 && styles.llevada4acarreo1,
+        digitoMayor.length === 4 && resultado.length >= 3 && styles.llevada4acarreo2
     ]}>{accarreo.join(' ')}</Text>
       {paddedNumbers.map((paddedNum, index) => (
         <View key={index} style={styles.row}>
@@ -1197,8 +1251,13 @@ const Aritmetica = () => {
         {resultado3}
       </Text>
       {filasCompletas && (
-            <View style={styles.dividerMult} />
-        )}
+        <View style={styles.container}>
+          <View style={styles.dividerMult} />
+          <Text style={styles.plusSign}>-</Text>
+          <Text style={styles.plusSign2}>-</Text>
+          
+        </View>
+      )}
       <Text style={[styles.result4, { right: rightPosition  }]}>
         {resultado4}
       </Text>
@@ -1212,12 +1271,11 @@ return (
     <View style={styles.container}>
     <Text style={[styles.text, styles.title]}>Aritmética</Text>
     
-    {showNavegacion && !hasShownNavegacion && (
-      <Animated.Text style={[styles.text, { opacity }]} onLayout={() => setHasShownNavegacion(false)}>
-        {navegacion}
-      </Animated.Text>
+    {showBienvenida && !hasShownBienvenida && (
+      <Text style={[styles.aritmeticatext]}>
+        {bienvenida}
+      </Text>
     )}
-    {message && <Text style={styles.text}>{message}</Text>}
    
       <TouchableOpacity style={styles.micButton} onPress={recording ? stopRecording : startRecording}>
         <Icon name={recording ? 'stop' : 'microphone'} size={60} color={recording ? 'red' : 'black'} />

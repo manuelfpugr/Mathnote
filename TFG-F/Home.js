@@ -20,7 +20,6 @@ const Home = () => {
   const navigation = useNavigation();
   const [bienvenida, setBienvenida] = useState("¡Bienvenido a Mathnote!");
   const [navegacion, setNavegacion] = useState("¿Hacia dónde vamos?");
-  const [opacity] = useState(new Animated.Value(1));
   const [recording, setRecording] = useState(null);
   const [message, setMessage] = useState('');
   const [transcription, setTranscription] = useState('');
@@ -29,29 +28,6 @@ const Home = () => {
   const [showNavegacion, setShowNavegacion] = useState(false);
   const [hasShownBienvenida, setHasShownBienvenida] = useState(false);
   const [hasShownNavegacion, setHasShownNavegacion] = useState(false);
-
-  useEffect(() => {
-    const timer1 = setTimeout(() => {
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 2000,
-        useNativeDriver: true,
-      }).start(() => {
-        setShowBienvenida(false);
-        const timer2 = setTimeout(() => {
-          setShowNavegacion(true);
-          Animated.timing(opacity, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-          }).start();
-        }, 1000); // Espera 2 segundos antes de mostrar el mensaje de navegación
-        return () => clearTimeout(timer2);
-      });
-    }, 1000);
-
-    return () => clearTimeout(timer1);
-  }, []);
 
   if (!fontsLoaded) {
     return (
@@ -328,20 +304,13 @@ const Home = () => {
   return (
     <View style={styles.container}>
       <Text style={[styles.text, styles.title]}>Mathnote</Text>
-      <View style={styles.fixedSizeContainer}>
+    
     {showBienvenida && !hasShownBienvenida && (
-      <Animated.Text style={[styles.text, { opacity }]} onLayout={() => setHasShownBienvenida(false)}>
+      <Text style={[styles.text]}>
         {bienvenida}
-      </Animated.Text>
+      </Text>
     )}
-    </View>
-    <View style={styles.fixedSizeContainer}>
-    {showNavegacion && !hasShownNavegacion && (
-      <Animated.Text style={[styles.text, { opacity }]} onLayout={() => setHasShownNavegacion(false)}>
-        {navegacion}
-      </Animated.Text>
-    )}
-     </View>
+ 
     {message && <Text style={styles.text}>{message}</Text>}
   
     <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Aritmetica')}>

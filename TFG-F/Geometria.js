@@ -22,6 +22,9 @@ import {drawAngle, normalizeText, generateUniqueId} from './utils/utils.js';
 
 
 const Geometria = () => {
+  const [bienvenida, setBienvenida] = useState("¡Bienvenido a Geometría!");
+  const [showBienvenida, setShowBienvenida] = useState(true);
+  const [hasShownBienvenida, setHasShownBienvenida] = useState(false);
   //Guardado
   const route = useRoute();
   const navigation = useNavigation();
@@ -51,6 +54,31 @@ const Geometria = () => {
   const [volumen, setVolumen] = useState(0);
   const [apotema, setApotema] = useState(0);
   const [angleDegrees, setAngleDegrees] = useState(0);
+
+  React.useEffect(() => {
+    if (!hasShownBienvenida) {
+      const timer1 = setTimeout(() => {
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }).start(() => {
+          setShowBienvenida(false);
+          setHasShownBienvenida(true);
+          const timer2 = setTimeout(() => {
+            Animated.timing(opacity, {
+              toValue: 1,
+              duration: 2000,
+              useNativeDriver: true,
+            }).start();
+          }, 2000); // Espera 2 segundos antes de mostrar el mensaje de navegación
+          return () => clearTimeout(timer2);
+        });
+      }, 3000);
+  
+      return () => clearTimeout(timer1);
+    }
+  }, [hasShownBienvenida]);
   
   const startRecording = async () => {
     try {
@@ -857,9 +885,9 @@ const Geometria = () => {
             <View style={styles.squareContainer}>
             <MaterialCommunityIcons name="pyramid" size={300} color="black" />
             {lado !== null && lado !== 0 && <Text style={styles.piramideText}>{lado}</Text>}
-            {altura !== null && altura !== 0 && <Text style={styles.piramideText2}>{altura}</Text>}
+            {altura !== null && altura !== 0 && <Text style={styles.piramideText3}>{altura}</Text>}
             {altura !== null && altura !== 0 && <View style={styles.piramideredBar} />}
-            {apotema !== null && apotema !== 0 && <Text style={styles.piramideText3}>{apotema}</Text>}
+            {apotema !== null && apotema !== 0 && <Text style={styles.piramideText2}>{apotema}</Text>}
             {apotema !== null && apotema !== 0 && <View style={styles.piramideredBar2} />}
             </View>
           </View>
@@ -927,6 +955,13 @@ const Geometria = () => {
   return (
     <View style={styles.container}>
       <Text style={[styles.text, styles.title]}>Geometría</Text>
+         
+    {showBienvenida && !hasShownBienvenida && (
+      <Text style={[styles.aritmeticatext]}>
+        {bienvenida}
+      </Text>
+    )}
+
       {message && <Text style={styles.messageText}>{message}</Text>}
 
       <TouchableOpacity style={styles.micButton} onPress={recording ? stopRecording : startRecording}>
