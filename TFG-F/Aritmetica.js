@@ -171,9 +171,7 @@ const Aritmetica = () => {
     // Captura y guardar operación
     const guardar = regexUtils.matchGuardarOperacion(text);
 
-    console.log('Texto:',text, match, filasCompletas, divisionProc3);
     if(guardar){
-      console.log('Guardar operación');
       handleSave();
     }
     else if (match && operacion === false && division.length === 0) {
@@ -190,7 +188,6 @@ const Aritmetica = () => {
         numbers.push(...additionalMatches);
         setNumeros(numbers);
         let dig = numeroConMasDigitos(numbers);
-        console.log(numeros);
         if(dig)
         {
           setDigitoMayor(dig);
@@ -201,18 +198,12 @@ const Aritmetica = () => {
 
       if(match && match[2] === '-' || match[2] === 'menos'){
         setRestas(numbers);
-        console.log("Restas", restas);
       }
       else if(match && match[2] === '+' || match[2] === 'más' || match[2] === 'mas'){
         setSumas(numbers);
-        console.log("Sumas", sumas);
         
       }
 
-
-      
-      console.log('Numbers 2:', numbers);
-      console.log(digitoMayor);
   
       // Convertir el operador a su símbolo correspondiente
       switch (operator) {
@@ -251,7 +242,6 @@ const Aritmetica = () => {
       if (numberWords.hasOwnProperty(cogerNumeroMatch[2])) {
         let number = numberWords[cogerNumeroMatch[2]];
       
-      console.log('Coger número transformado:', number);
       setcogerNumero(number);
     }
     else{
@@ -260,7 +250,7 @@ const Aritmetica = () => {
     
   }
  else if((div || division.length > 0) && ( divisionProc1 || (division.length > 0 && resultAcarreo) || resultMult || divisionProcAcarreo || div || divisionProc2 || divisionProc3 || procedimientoBajarNum || procedimientoResta || procedimientoResta2 || coma) ){
- console.log("AQUI");
+
   divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajarNum, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, procedimientoDivLinea3, cociente);
   }else if(filasCompletas && division.length === 0){
       sumaMultiplicacion(text);
@@ -268,7 +258,6 @@ const Aritmetica = () => {
       
      let expectedResult = null;
       if(resultAcarreo){
-        console.log("Acarreo", resultAcarreo);
         expectedResult = resultAcarreo[1] ? parseInt(resultAcarreo[1], 10) : parseInt(resultAcarreo[2], 10);
       }else{
         expectedResult = parseInt(resultMult[3], 10);
@@ -278,7 +267,6 @@ const Aritmetica = () => {
     else if(operacion === true && resultMatch && !matchAccarreo && division.length === 0) {
       const expectedResult = parseInt(resultMatch[2], 10);
 
-      console.log('Expresión:',expectedResult);
 
       if (expectedResult !== null && expectedResult !== undefined) {
         setResultado(prevResultado => [expectedResult, ...prevResultado]);
@@ -289,7 +277,7 @@ const Aritmetica = () => {
      adicionSumaResta(match);
   
     }else if (operacion === true && !matchAccarreo && !guardar && multiplicador.length === 0 && multiplicando.length === 0) {
-      console.log("ttt");
+
       operacionSumaResta(text);
     }else if(matchAccarreo){
       funcionAcarreo(matchAccarreo, division);
@@ -308,10 +296,10 @@ const Aritmetica = () => {
         if (operation.operacion === 'multiplicacion') {
           setMultiplicador(operation.detalles.multiplicador);
           setMultiplicando(operation.detalles.multiplicando);
-          console.log('Multiplicador:', multiplicador, 'Multiplicando:', multiplicando);
+
           handleOperation(`${operation.detalles.multiplicador} x ${operation.detalles.multiplicando}`);
         } else if (operation.operacion === 'suma') {
-          console.log('Sumas: ----------------------------------------------------------------', operation.detalles.sumas.join(' mas '));
+
           setSumas(operation.detalles.sumas);
           handleOperation(operation.detalles.sumas.join(' más '));
         } else if (operation.operacion === 'resta') {
@@ -330,7 +318,7 @@ const Aritmetica = () => {
     const fetchOperations = async () => {
       const ops = await getAllOperations();
       setOperations(ops);
-      console.log('Operaciones almacenadas:', ops);
+
     };
 
     fetchOperations();
@@ -428,7 +416,7 @@ const Aritmetica = () => {
       numbers.push(...additionalMatchesRest);
     }
     setNumeros(numbers);
-    console.log('Numbers:', numbers);
+
   }
   // Operacion Suma y Resta
   function operacionSumaResta(text) {
@@ -447,15 +435,15 @@ const Aritmetica = () => {
       if (singleDigitMatch && !multipleSum && !regexAcarreo) {
         const singleDigit = numberWords[singleDigitMatch[0]] !== undefined ? numberWords[singleDigitMatch[0]] : parseInt(singleDigitMatch[0], 10);
         setResultado(prevResultado => [singleDigit, ...prevResultado]);
-        console.log('Número capturado:', singleDigit);
+
         return; // Salir de la función si se encuentra un número de un solo dígito o palabra que representa un número
       }
       
-      console.log('Texto procesado:', lowerText, numeros, digitoMayor.length, resultado.length);
+
 
       if(regexAcarreo){
         let regxNumber =  Number(regexAcarreo[5])+  Number(regexAcarreo[6]);
-        console.log(regexAcarreo, regxNumber);
+ 
         {
           if(digitoMayor.length === 4 && resultado.length < 3 && regxNumber > 10){
             regxNumber = regxNumber % 10;
@@ -464,7 +452,7 @@ const Aritmetica = () => {
          }else if(digitoMayor.length === 2 && resultado.length < 1 && regxNumber> 10){
           regxNumber = regxNumber % 10;
          }
-          console.log('Texto procesado Acarreo:', regexAcarreo[3]);
+
           setResultado(prevResultado => [regxNumber, ...prevResultado]);
         }
         return;
@@ -480,31 +468,23 @@ const Aritmetica = () => {
        }else if(digitoMayor.length === 2 && resultado.length < 1 && multipleSum[2] > 10){
         multipleSum[2] = multipleSum[2] % 10;
        }
-        console.log('Texto procesado 2:', multipleSum[2]);
+
         setResultado(prevResultado => [multipleSum[2], ...prevResultado]);
       }
     }
     // Acarreo
   function funcionAcarreo(matchAccarreo, division) {
-    console.log('Texto procesado:', matchAccarreo);
         const carryNumber = [matchAccarreo[2]];
-        if(operacion)
-        {
-          console.log("SUMA");
-        }
-        console.log('Número de acarreo:', carryNumber);
+
         const lowerText = matchAccarreo[2].toLowerCase().replace(/[.,]$/, '').trim();
-        console.log('Texto procesado:', lowerText);
         if (numberWords.hasOwnProperty(lowerText)) {
           const number = numberWords[lowerText];
           
-          console.log('Número encontrado:', number);
           if(division.length > 0)
           {
             setAccarreoDiv(prevAccarreo => [ number ,...prevAccarreo]);
           }
           setAccarreo(prevAccarreo => [ number ,...prevAccarreo]);
-          console.log('Acarreo:', accarreo);
         }
   }
   
@@ -512,7 +492,6 @@ const Aritmetica = () => {
   // Métodos para la Multiplicación
     // Procesado de las filas
   function procesarFila(fila, numPorFila, expectedResult, filasMultiplicacion, resultado) {
-    console.log("Fila", fila, numPorFila,  inserciones[`fila${fila}`]);
 
     if (fila === 1 && filaAnterior === 0 && !reinicioAcarreo) {
       setAccarreo([]);
@@ -538,22 +517,18 @@ const Aritmetica = () => {
       if (expectedResult >= 10 && inserciones[`fila${fila}`] === numPorFila - 1) {
           setResultadoFila(fila, expectedResult);
           setInserciones(prevInserciones => ({ ...prevInserciones, [`fila${fila}`]: prevInserciones[`fila${fila}`] + 1 }));
-          console.log(`Fila ${fila} Mod Final`, filasMultiplicacion, resultado);
       } else if (expectedResult >= 10) {
           let expectedResultMod = expectedResult % 10;
           setResultadoFila(fila, expectedResultMod);
           setInserciones(prevInserciones => ({ ...prevInserciones, [`fila${fila}`]: prevInserciones[`fila${fila}`] + 1 }));
-          console.log(`Fila ${fila} Mod`, filasMultiplicacion, resultado);
       } else {
           setResultadoFila(fila, expectedResult);
           setInserciones(prevInserciones => ({ ...prevInserciones, [`fila${fila}`]: prevInserciones[`fila${fila}`] + 1 }));
-          console.log(`Fila ${fila}`, filasMultiplicacion, resultado);
       }
       setFilaAnterior(fila); // Actualizar la fila anterior
   }
   // Procesado del resto de la multiplicación
   function procesarMultiplicacion(expectedResult, multiplicador, multiplicando, inserciones, reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas, resultado) {
-    console.log('Expresión Mult:', expectedResult, multiplicador, multiplicando);
 
     let filasMultiplicacion = [];
     let filaActual = 0;  // Variable para rastrear la fila actual, comenzando en 0
@@ -562,7 +537,6 @@ const Aritmetica = () => {
     const numFilas = multiplicando.toString().length;  // Número de filas, máximo 3
     const numPorFila = multiplicador.toString().length;  // Cantidad de números por fila
 
-    console.log("Multiplicador", multiplicador, "Multiplicando", multiplicando, "numFilas", numFilas, "numPorFilas", numPorFila);
 
     if (expectedResult !== null && expectedResult !== undefined) {
         // Aquí asumimos que el usuario inserta el número directamente
@@ -571,10 +545,7 @@ const Aritmetica = () => {
         const numLength = fila.toString().length;  // Longitud del número actual
         numActual++; // Ajusta numActual según la longitud del número
 
-        console.log("Num a insertar", expectedResult, numPorFila - 1, inserciones);
-
         // Solo cuando la fila actual esté completa, se moverá al resultado correspondiente
-        console.log("Inserciones", inserciones);
         // Procesado de las filas en la multiplicación
         if (inserciones.fila0 < numPorFila && inserciones.fila1 === 0) {
             procesarFila(0, numPorFila, expectedResult, filasMultiplicacion, resultado);
@@ -593,31 +564,24 @@ const Aritmetica = () => {
         }
 
         if (reinicioAcarreo === true && numFilas === 1) {
-            console.log("Para una Fila");
             setFilasCompletas(true);
         } else if (reinicioAcarreo2 === true && numFilas === 2) {
-            console.log("Para dos Filas");
             setFilasCompletas(true);
         } else if (reinicioAcarreo3 === true && numFilas === 3) {
-            console.log("Para tres Filas");
             setFilasCompletas(true);
         }
-
-        console.log("Reinicios", reinicioAcarreo, reinicioAcarreo2, reinicioAcarreo3, filasCompletas);
     }
   }
   // Suma de Multiplicación
     function sumaMultiplicacion(text) {
-      console.log("Suma de multiplicación");
           const lowerText = text.toLowerCase().replace(/[.,]$/, '').trim();
-          console.log('Texto procesado:', lowerText);
           const regexAcarreo = lowerText.match(/(\d+)\s*(más|y)?\s*(\d+)?/g);
           const regexOperacion = lowerText.match(/^\s*(\d+)\s*(?:\+|mas|más)\s*(\d+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)?\s*$/i);
           const regexNumerico = lowerText.match(/^(1[0-8]|[0-9])\.?$/);
           const regexPalabras = lowerText.match(/^(cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciséis|diecisiete|dieciocho)\.?$/i);
         
           if(regexAcarreo){
-            console.log('Expresión Acarreo:', regexAcarreo[2]);
+    
             
             if(regexAcarreo[2] >= 10 && resultado4.length <= 6){
               regexAcarreo[2] = regexAcarreo[2] % 10;
@@ -627,7 +591,6 @@ const Aritmetica = () => {
           if(regexOperacion){
              result = parseInt(regexOperacion[3], 10);
 
-            console.log('Expresión:', result, resultado4.length);
             if(result >= 10 && resultado4.length <= 6){
               result = result % 10;
             }
@@ -641,19 +604,14 @@ const Aritmetica = () => {
             if (number > 10) {
               number = number % 10;
             }
-            console.log('Número encontrado:', number);
-            // setResultado4(prevResultado => [number, ...prevResultado]);
-          
 
             if(number > 10)
             {
               let numberMod = number % 10;
-              console.log("Resultado 4 Mod", resultado4)
               setResultado4(prevResultado => [numberMod, ...prevResultado]);
             }
             else
             {
-              console.log("Resultado 4", resultado4)
               setResultado4(prevResultado => [number, ...prevResultado]);
             }
           }
@@ -662,11 +620,8 @@ const Aritmetica = () => {
   // Métodos para la división
     // Función para manejar la división
     function establecerDivision(div) {
-     
-        console.log("División", div);
-
+    
         const divisor = div[3];
-        console.log("Divisor", divisor, divisor.toString()[0]);
         setPrimerDigitoDivisor(divisor.toString()[0]);
 
         const resultados = div.map(division => {
@@ -680,13 +635,11 @@ const Aritmetica = () => {
         }).filter(result => result !== null);
 
         setDivision(resultados);
-        console.log("DIV", division, primerDigitoDivisor);
     
     }
 
     // Función para manejar la resta de la división
     function handleRestaDivision(procedimientoResta, procedimientoResta2) {
-      console.log("Resta de la división", procedimientoResta, procedimientoResta2);
 
           if (procedimientoResta) {
             // Asegurarse de que procedimientoResta es un array
@@ -697,26 +650,21 @@ const Aritmetica = () => {
             
               // Convertirlo a un número entero (opcional)
               const ultimoNumeroInt = parseInt(ultimoNumero, 10);
-              console.log("Resta de la división", ultimoNumeroInt, cociente.length);
             if(cociente.length >= 1 && cociente.length < 2){
-              console.log("Resta de la división 1");
               setProcedimientoRestar(prevResultado => [ultimoNumeroInt, ...prevResultado]);
             }else if (cociente.length >= 2 && cociente.length < 3)  {
-              console.log("Resta de la división 2");
               if(cociente.includes(",")){
                 setProcedimientoRestar(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }else{
               setProcedimientoRestar2(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }
             }else if (cociente.length >= 3 && cociente.length < 4) {
-              console.log("Resta de la división 3");
               if(cociente.includes(",")){
                 setProcedimientoRestar2(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }else{
               setProcedimientoRestar3(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }
             }else if (cociente.length >= 4 && cociente.length < 5) {
-              console.log("Resta de la división 4");
               if(cociente.includes(",")){
                 setProcedimientoRestar3(prevResultado => [ultimoNumeroInt, ...prevResultado]);
               }else{
@@ -729,16 +677,12 @@ const Aritmetica = () => {
           }else if(procedimientoResta2){
             
               const lowerText = procedimientoResta2[1].toLowerCase().replace(/[.,]$/, '').trim();
-              console.log("Resta de la división 2", lowerText);
               if (numberWords.hasOwnProperty(lowerText)) {
                 number = numberWords[lowerText];
-                console.log(number);
               if(procedimientoRestar.length === 0){
                 setProcedimientoRestar(prevResultado => [number, ...prevResultado]);
-                console.log("Añadido ", procedimientoRestar)
               }else{
                 setProcedimientoRestar2(prevResultado => [number, ...prevResultado]);
-                console.log("Añadido Línea 2 ", procedimientoRestar2)
               }
             }else{
               if(procedimientoRestar.length === 0){
@@ -755,62 +699,50 @@ const Aritmetica = () => {
     function bajarNumeroDivision(procedimientoBajarNum) {
       const partes = procedimientoBajarNum[0].match(/\b(bajo|bajar)\s+(el\s+)?(número\s+)?(0|1|2|3|4|5|6|7|8|9|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve)\b/i);
           let number = partes[4];
-          console.log("Activa bajar");
           if(procedimientoBajar.length === 0){
           if (numberWords.hasOwnProperty(number)) {
             number = numberWords[number];
           }
-          console.log("Baja el número", number);
           setProcedimientoBajar(number);
         }else if(procedimientoBajar2.length === 0){
           if (numberWords.hasOwnProperty(number)) {
             number = numberWords[number];
           }
-          console.log("Baja el número a la linea 2", number);
           setProcedimientoBajar2(number);
         }else if(procedimientoBajar3.length === 0){
           if (numberWords.hasOwnProperty(number)) {
             number = numberWords[number];
           }
-          console.log("Baja el número a la linea 3", number);
           setProcedimientoBajar3(number);
         }
     }
 
     // Función para eliminar puntos y comas de los números en la división
     function handleComa() {
-      console.log("Coma", cociente.length);
       setCociente(prevResultado => [...prevResultado, ","]);
       if(cociente.length >= 1 && cociente.length < 2){
-        console.log("Coma a la linea 1");
       setProcedimientoRestar(prevResultado => [...prevResultado, 0]);
       }else if (cociente.length >= 2 && cociente.length < 3)  {
-        console.log("Coma a la linea 2");
       setProcedimientoRestar2(prevResultado => [...prevResultado, 0]);
       }else if (cociente.length >= 3 && cociente.length < 4) {
-      console.log("Coma a la linea 3");
       setProcedimientoRestar3(prevResultado => [...prevResultado, 0]);
       }else if (cociente.length >= 4 && cociente.length < 5) {
-        console.log("Coma a la linea 4");
         setProcedimientoRestar4(prevResultado => [...prevResultado, 0]);
       }
     }
 
     function divisionGeneral(division, div, coma, procedimientoResta, resultMult, procedimientoResta2, procedimientoBajar, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar, cociente) {   
       if (division && division.length === 0) {
-        let divMod = normalizeNumber(div);
-        console.log("Division 2", divMod, division, resultMult);    
+        let divMod = normalizeNumber(div); 
         
         if(divMod)
           div = divMod;
       
-        console.log("Division3", division, div)
           establecerDivision(div);
       } else if (coma) {
           handleComa();
       } else if (procedimientoResta || procedimientoResta2) {
 
-        console.log("Resta division", procedimientoResta, procedimientoResta2);
           handleRestaDivision(procedimientoResta, procedimientoResta2);
       } else if (procedimientoBajar) {
           bajarNumeroDivision(procedimientoBajar);
@@ -821,42 +753,27 @@ const Aritmetica = () => {
 
     // Función para procesar la división
     function procesarDivision(resultMult, divisionProc1, divisionProc2, divisionProc3, divisionProcAcarreo, resultAcarreo, primerDigitoDivisor, procedimientoRestar) {
-      console.log("Division Lleno", cociente);
-      console.log("Procedimiento", divisionProc1, divisionProc2, resultMult);
-      console.log("Primer Dig", primerDigitoDivisor);
-
       if (divisionProc3) {
-        console.log("Cociente numero 3", divisionProc3[2]);
         const lowerText = divisionProc3[2].toLowerCase().replace(/[.,]$/, '').trim();
-        console.log("Texto procesado:", lowerText);
         if(numberWords.hasOwnProperty(lowerText)){
-          console.log("Cociente sucio", divisionProc3[2]);
           let number = numberWords[lowerText];
           setCociente(prevResultado => [...prevResultado, number]);
         }else{
-          console.log("Cociente limpio", divisionProc3[2]);
           setCociente(prevResultado => [...prevResultado, divisionProc3[2]]);
         }
         
       } else if (divisionProc2) {
-        console.log("Cociente numero 2", divisionProc2[2]);
       } else if (divisionProcAcarreo || resultAcarreo) {
         let result = 0;
-        console.log("ACCAREREO", divisionProcAcarreo, resultAcarreo);
 
         if (divisionProcAcarreo !== null && divisionProcAcarreo !== undefined && divisionProcAcarreo.length > 0) {
           let divisionProcAcarreoDiv = divisionProcAcarreo[0];
-          console.log("Acarreo Div", divisionProcAcarreoDiv);
           const results = extractFirstNumber(divisionProcAcarreoDiv);
-          console.log("Primer digito divisor 0/", results[0], primerDigitoDivisor);
         } else if (resultAcarreo !== null && resultAcarreo !== undefined && resultAcarreo.length > 0) {
           let resultAcarreoDiv = resultAcarreo[0];
-          console.log("Acarreo Div", resultAcarreoDiv);
           const results = extractFirstNumber(resultAcarreoDiv);
-          console.log("Primer digito divisor 1/", results[0], primerDigitoDivisor);
 
           if (results !== primerDigitoDivisor) {
-            console.log("Primer digito divisor con acarreo", results, primerDigitoDivisor);
 
             if (resultAcarreo[2] !== undefined) {
               result = resultAcarreo[2] % 10;
@@ -871,17 +788,12 @@ const Aritmetica = () => {
           }
         }
       } else if (divisionProc1 || resultMult) {
-        console.log("AQUI",resultMult[3]);
-        console.log(Number(resultMult[3])); // Debería imprimir el tipo de resultMult[3]
-        console.log(Number(primerDigitoDivisor));
+
         if ( Number(resultMult[1]) !== Number(primerDigitoDivisor))  {
-          console.log("Primer digito divisor", resultMult, primerDigitoDivisor);
           resultMult[3] = resultMult[3] % 10;
         }
-        console.log("AAA", resultMult[3], contadorCociente, cociente);
 
         if (procedimientoRestar.length === 0) {
-          console.log("Cociente numero Mult", resultMult[3]);
 
           if (cociente.length === 0) {
             setCociente(resultMult[3]);
@@ -891,14 +803,11 @@ const Aritmetica = () => {
             setProcedimientoDiv(prevResultado => [resultMult[3], ...prevResultado]);
           }
         } else if (cociente.length > 1 && cociente.length < 3) {
-          console.log("ENTRA", cociente.length);
+    
           if (cociente.includes(',') && cociente.length === 2) {
-            console.log("Cociente", cociente.length);
             setCociente(prevResultado => [...prevResultado, resultMult[3]]);
-            console.log("Cociente numero Mult Segunda Linea", resultMult[3]);
             setProcedimientoDiv(prevResultado => [resultMult[3], ...prevResultado]);
           }else if (cociente.length === 1 && !cociente.includes(',')) {
-            console.log("Cociente numero Mult Segunda Linea Pr", resultMult[3]);
             setCociente(prevResultado => [...prevResultado, resultMult[3]]);
             setProcedimientoDivLinea2(prevResultado => [resultMult[3], ...prevResultado]);
           } else {
@@ -906,14 +815,10 @@ const Aritmetica = () => {
           }
         }
         else if (cociente.length > 2 && cociente.length < 4) {
-          console.log("ENTRA 3", cociente.length);
           if (cociente.includes(',') && cociente.length === 3) {
-            console.log("Cociente", cociente.length);
-            
-            console.log("Cociente numero Mult Tres Linea", resultMult[3]);
+
             setProcedimientoDivLinea2(prevResultado => [resultMult[3], ...prevResultado]);
           }else if (cociente.length === 1 && !cociente.includes(',')) {
-            console.log("Cociente numero Mult Tercera Linea Pr", resultMult[3]);
             setCociente(prevResultado => [...prevResultado, resultMult[3]]);
             setProcedimientoDivLinea3(prevResultado => [resultMult[3], ...prevResultado]);
           } else {
@@ -921,14 +826,9 @@ const Aritmetica = () => {
           }
         }
         else if (cociente.length > 3 && cociente.length < 5) {
-          console.log("ENTRA 4", cociente.length);
           if (cociente.includes(',') && cociente.length === 4) {
-            console.log("Cociente", cociente.length);
-            
-            console.log("Cociente numero Mult Cuarta Linea", resultMult[3]);
             setProcedimientoDivLinea3(prevResultado => [resultMult[3], ...prevResultado]);
           }else if (cociente.length === 1 && !cociente.includes(',')) {
-            console.log("Cociente numero Mult Cuarta Linea Pr", resultMult[3]);
             setCociente(prevResultado => [...prevResultado, resultMult[3]]);
             setProcedimientoDivLinea4(prevResultado => [resultMult[3], ...prevResultado]);
           } else 
@@ -939,7 +839,6 @@ const Aritmetica = () => {
     }
 
     const handleSave = async () => {
-      console.log("Entra", division, multiplicador, multiplicando, sumas, restas);
     
       try {
         let operationData = null;
@@ -949,7 +848,6 @@ const Aritmetica = () => {
     
         if (division.length > 0) {
           const { dividendo, divisor } = division[0];
-          console.log("Guardar division", division[0].dividendo );
       
           operationData = {
             id: newId,
@@ -957,7 +855,6 @@ const Aritmetica = () => {
             detalles: {dividendo, divisor},
           };
         } else if (multiplicador&& multiplicando > 0) {
-          console.log("Guardar multiplicación", multiplicador, multiplicando);
        
           operationData = {
             id: newId,
@@ -965,7 +862,6 @@ const Aritmetica = () => {
             detalles: { multiplicador, multiplicando },
           };
         } else if (restas.length > 0) {
-          console.log("Guardar restas", restas);
 
           operationData = {
             id: newId,
@@ -973,7 +869,6 @@ const Aritmetica = () => {
             detalles: { restas },
           };
         } else if (sumas.length > 0) {
-          console.log("Guardar sumas", sumas);
  
           operationData = {
             id: newId,
@@ -990,7 +885,6 @@ const Aritmetica = () => {
         
           const ops = await getAllOperations();
           setOperations(ops);
-          console.log('Operaciones actualizadas:', ops);
           navigation.navigate('Home');
         }
       } catch (error) {

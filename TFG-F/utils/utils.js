@@ -1,5 +1,49 @@
 
 import * as Font from 'expo-font';
+import { getAllOperationIds } from '../db/database';
+import { Svg, Line, Text as SvgText } from 'react-native-svg';
+
+export const normalizeText = (text) => {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Elimina los caracteres diacríticos
+    .trim()
+    .replace(/\s+/g, ' ');
+};
+export const drawAngle = ( degrees ) => {
+
+  const radius = 50; // Radio del círculo
+  const angleInRadians = (degrees * Math.PI) / 180; // Convertir grados a radianes
+
+  // Coordenadas del punto final de la línea
+  const x = radius + radius * Math.cos(angleInRadians);
+  const y = radius - radius * Math.sin(angleInRadians);
+
+  return (
+    <Svg height="300" width="300" viewBox="0 0 100 100">
+      {/* Línea horizontal */}
+      <Line x1={radius} y1={radius} x2={radius * 2} y2={radius} stroke="black" strokeWidth="2" />
+      {/* Línea del ángulo */}
+      <Line x1={radius} y1={radius} x2={x} y2={y} stroke="black" strokeWidth="2" />
+      {/* Texto del ángulo */}
+      <SvgText x={radius + 10} y={radius - 10} fontSize="10" fill="black">
+  {degrees}°
+</SvgText>
+    </Svg>
+  );
+};
+
+
+
+export const generateUniqueId = async () => {
+  const existingIds = await getAllOperationIds();
+  let newId;
+  do {
+    newId = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+  } while (existingIds.includes(newId));
+  return newId;
+};
 
 
 export const extractFirstNumber = (text) => {
@@ -10,6 +54,23 @@ export const extractFirstNumber = (text) => {
   export const removeDots = (numberStr) => {
     return numberStr.replace(/\./g, '');
   };
+  
+  export const numeroConMasDigitos = (numeros) => {
+    if (!Array.isArray(numeros) || numeros.length === 0) {
+      return null; // Manejar caso de array vacío o no válido
+    }
+  
+    let numeroConMasDigitos = numeros[0];
+  
+    for (let i = 1; i < numeros.length; i++) {
+      if (numeros[i].toString().length > numeroConMasDigitos.toString().length) {
+        numeroConMasDigitos = numeros[i];
+      }
+    }
+  
+    return numeroConMasDigitos;
+  };
+  
 
   // Función para normalizar números de 5 cifras
   export const normalizeNumber = (divisionArray) => {

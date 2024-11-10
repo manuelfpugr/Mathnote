@@ -142,11 +142,9 @@ const Geometria = () => {
     const dimensionMatch = regexUtils.matchDimension(normalizedText); // Captura la dimensión
     const guardar = regexUtils.matchGuardarOperacion(text); //Guardado
   
-    console.log("Dimension: ", dimensionMatch, normalizedText);
-    console.log("Figura: ", figure);
 
     if(guardar){
-      console.log('Guardar operación');
+
       handleSave();
     }
 
@@ -161,7 +159,6 @@ const Geometria = () => {
       setFigure('angulo');
       setAngleDegrees(angleRegex); // Actualiza el estado del ángulo
     } else if (dimensionMatch && figure ) {
-      console.log("Dimension 2 ", dimensionMatch);
       const dimensionType = dimensionMatch[1].toLowerCase();
       const dimensionValue = dimensionMatch[2];
 
@@ -169,64 +166,64 @@ const Geometria = () => {
         case 'cuadrado':
           if (dimensionType === 'lado') {
             setLado(dimensionValue);
-            console.log("Lado: " + lado);
+           
           } else if (dimensionType === 'area') {
             setArea(dimensionValue);
-            console.log("Área: " + area);
+      
           } else if (dimensionType === 'perimetro') {
             setPerimetro(dimensionValue);
-            console.log("Perímetro: " + perimetro);
+        
           }
           break; // Asegúrate de agregar un break para evitar que continúe al siguiente caso
   
         case 'triangulo':
           if (dimensionType === 'lado') {
             setLado(dimensionValue);
-            console.log("Lado: " + lado);
+            
           }else if (dimensionType === 'base') {
               setBase(dimensionValue);
-              console.log("Base: " + base);
+             
           }else if (dimensionType === 'altura') {
               setAltura(dimensionValue);
-              console.log("Altura: " + altura);
+              
             }else if (dimensionType === 'area') {
               setArea(dimensionValue);
-              console.log("Área: " + area);
+          
             } else if (dimensionType === 'perimetro') {
               setPerimetro(dimensionValue);
-              console.log("Perímetro: " + perimetro);
+             
             }
           break;
       
         case 'rectangulo':
           if (dimensionType === 'base') {
             setBase(dimensionValue);
-            console.log("Base: " + base);
+           
           } else if (dimensionType === 'altura') {
               setAltura(dimensionValue);
-              console.log("Altura: " + altura);
+             
             } else if (dimensionType === 'area') {
               setArea(dimensionValue);
-              console.log("Área: " + area);
+              
             } else if (dimensionType === 'perimetro') {
               setPerimetro(dimensionValue);
-              console.log("Perímetro: " + perimetro);
+             
             }
           break;
 
           case 'circulo':
             if (dimensionType === 'radio') {
               setRadio(dimensionValue);
-              console.log("Radio: " + radio);
+             
             } else if (dimensionType === 'diametro') {
               setDiametro(dimensionValue);
-              console.log("Diámetro: " + diametro);
+   
             } else if (dimensionType === 'circunferencia') {
               setPerimetro(dimensionValue);
-              console.log("Circunferencia: " + perimetro);
+            
             } else if (dimensionType === 'area') {
               setArea(dimensionValue);
-              console.log("Área: " + area);
+         
             }          
             break;
           
@@ -234,184 +231,184 @@ const Geometria = () => {
           case 'pentagono':
             if (dimensionType === 'lado') {
               setLado(dimensionValue);
-              console.log("Lado: " + lado);
+     
             }
             else if (dimensionType === 'altura') {
               setAltura(dimensionValue);
-              console.log("Altura: " + altura);
+     
             } else if (dimensionType === 'perimetro') {
               setPerimetro(dimensionValue);
-              console.log("Perímetro: " + perimetro);
+      
             } else if (dimensionType === 'area') {
               setArea(dimensionValue);
-              console.log("Área: " + area);
+    
             }
           break;
 
           case 'hexagono':
             if (dimensionType === 'lado') {
               setLado(dimensionValue);
-              console.log("Lado: " + lado);
+       
             }
             else if (dimensionType === 'altura') {
               setAltura(dimensionValue);
-              console.log("Altura: " + altura);
+    
             }
             else if (dimensionType === 'perimetro') {
               setPerimetro(dimensionValue);
-              console.log("Perímetro: " + perimetro);
+    
             } else if (dimensionType === 'area') {
               setArea(dimensionValue);
-              console.log("Área: " + area);
+       
             }
           break;
        
           case 'rombo':
             if (dimensionType === 'lado') {
               setLado(dimensionValue);
-              console.log("Lado: " + lado);
+      
             }
             if (dimensionType === 'diagonal mayor') {
               setDiagonalMayor(dimensionValue);
-              console.log("Diagonal 1: " + diagonalMayor);
+     
             }
             else if (dimensionType === 'diagonal menor') {
               setDiagonalMenor(dimensionValue);
-              console.log("Diagonal 2: " + diagonalMenor);
+          
             }
             else if (dimensionType === 'perimetro') {
               setPerimetro(dimensionValue);
-              console.log("Perímetro: " + perimetro);
+      
             } else if (dimensionType === 'area') {
               setArea(dimensionValue);
-              console.log("Área: " + area);
+    
             }
           break;
             case 'elipse':
               if (dimensionType === 'eje mayor') {
                 setEjeMayor(dimensionValue);
-                console.log("Eje Mayor: " + ejeMayor);
+        
               }
               else if (dimensionType === 'eje menor') {
                 setEjeMenor(dimensionValue);
-                console.log("Eje Menor: " + ejeMenor);
+   
               }
               else if (dimensionType === 'distancia focal') {
                 setDistFocal(dimensionValue);
-                console.log("distFocal: " + distFocal);
+
               }
               else if (dimensionType === 'area') {
                 setArea(dimensionValue);
-                console.log("Área: " + area);
+             
               }
               else if (dimensionType === 'radio') {
                 setRadio(dimensionValue);
-                console.log("Radio: " + radio);
+         
               } else if (dimensionType === 'diametro') {
                 setDiametro(dimensionValue);
-                console.log("Diámetro: " + diametro);
+               
               }
               break;
           case 'esfera':
             if (dimensionType === 'radio') {
               setRadio(dimensionValue);
-              console.log("Radio: " + radio);
+          
             }
             else if (dimensionType === 'diametro') {
               setDiametro(dimensionValue);
-              console.log("Diámetro: " + diametro);
+           
             }
             else if (dimensionType === 'area') {
               setArea(dimensionValue);
-              console.log("Área: " + area);
+        
             }
             else if (dimensionType === 'volumen') {
               setVolumen(dimensionValue);
-              console.log("Volumen: " + volumen);
+       
             }
             else if (dimensionType === 'circunferencia') {
               setCircunferencia(dimensionValue);
-              console.log("Circunferencia: " + circunferencia);
+      
             }
             break;
           case 'piramide':
             if (dimensionType === 'lado') {
               setLado(dimensionValue);
-              console.log("Lado: " + lado);
+          
             }
             else if (dimensionType === 'altura') {
               setAltura(dimensionValue);
-              console.log("Altura: " + altura);
+      
             }
             else if (dimensionType === 'apotema') {
               setApotema(dimensionValue);
-              console.log("Apotema: " + apotema);
+           
             }
             else if (dimensionType === 'area') {
               setArea(dimensionValue);
-              console.log("Área: " + area);
+           
             }
             else if (dimensionType === 'volumen') {
               setVolumen(dimensionValue);
-              console.log("Volumen: " + volumen);
+         
             }
             break;
             case 'cubo':
               if(dimensionType === 'lado') {
                 setLado(dimensionValue);
-                console.log("Lado: " + lado);
+              
               }
               else if(dimensionType === 'area') {
                 setArea(dimensionValue);
-                console.log("Area: " + area);
+            
               }
               else if(dimensionType === 'volumen') {
                 setVolumen(dimensionValue);
-                console.log("Volumen: " + volumen);
+       
               }
               break;
             case 'cilindro':
               if(dimensionType === 'radio') {
                 setRadio(dimensionValue);
-                console.log("Radio: " + radio);
+         
               }
               else if(dimensionType === 'altura') {
                 setAltura(dimensionValue);
-                console.log("Altura: " + altura);
+         
               }
               else if(dimensionType === 'diametro') {
                 setDiametro(dimensionValue);
-                console.log("Diámetro: " + diametro);
+         
               }
               else if(dimensionType === 'area') {
                 setArea(dimensionValue);
-                console.log("Área: " + area);
+            
               }
               else if(dimensionType === 'volumen') {
                 setVolumen(dimensionValue);
-                console.log("Volumen: " + volumen);
+         
               }
               break;
             case 'cono':
               if(dimensionType === 'radio') {
                 setRadio(dimensionValue);
-                console.log("Radio: " + radio);
+             
               }
               else if(dimensionType === 'altura') {
                 setAltura(dimensionValue);
-                console.log("Altura: " + altura);
+         
               }
               else if(dimensionType === 'diametro') {
                 setDiametro(dimensionValue);
-                console.log("Diámetro: " + diametro);
+         
               }
               else if(dimensionType === 'area') {
                 setArea(dimensionValue);
-                console.log("Área: " + area);
+         
               }
               else if(dimensionType === 'volumen') {
                 setVolumen(dimensionValue);
-                console.log("Volumen: " + volumen);
+          
               }
               break;
         }
@@ -425,7 +422,6 @@ const Geometria = () => {
         switch (operation.operacion) {
           case 'cuadrado':
             setFigure('cuadrado');
-            console.log('Cuadrado: ----------------------------------------------------------------');
             setLado(operation.detalles.lado);
             setArea(operation.detalles.area);
             setPerimetro(operation.detalles.perimetro);
@@ -433,7 +429,6 @@ const Geometria = () => {
             break;
           case 'triangulo':
             setFigure('triangulo');
-            console.log('Triángulo: ----------------------------------------------------------------');
             setAltura(operation.detalles.altura);
             setBase(operation.detalles.base);
             setArea(operation.detalles.area);
@@ -443,7 +438,6 @@ const Geometria = () => {
             break;
           case 'rectangulo':
             setFigure('rectangulo');
-            console.log('Rectángulo: ----------------------------------------------------------------');
             setBase(operation.detalles.base);
             setAltura(operation.detalles.altura);
             setPerimetro(operation.detalles.perimetro);
@@ -452,7 +446,6 @@ const Geometria = () => {
             break;
           case 'circulo':
             setFigure('circulo');
-            console.log('Círculo: ----------------------------------------------------------------');
             setRadio(operation.detalles.radio);
             setDiametro(operation.detalles.diametro);
             setCircunferencia(operation.detalles.circunferencia);
@@ -461,7 +454,6 @@ const Geometria = () => {
             break;
           case 'pentagono':
             setFigure('pentagono');
-            console.log('Pentágono: ----------------------------------------------------------------');
             setLado(operation.detalles.lado);
             setArea(operation.detalles.area);
             setPerimetro(operation.detalles.perimetro);
@@ -470,7 +462,6 @@ const Geometria = () => {
             break;
           case 'hexagono':
             setFigure('hexagono');
-            console.log('Hexágono: ----------------------------------------------------------------');
             setLado(operation.detalles.lado);
             setArea(operation.detalles.area);
             setPerimetro(operation.detalles.perimetro);
@@ -479,7 +470,6 @@ const Geometria = () => {
             break;
           case 'rombo':
             setFigure('rombo');
-            console.log('Rombo: ----------------------------------------------------------------');
             setLado(operation.detalles.lado);
             setDiagonalMayor(operation.detalles.diagonalMayor);
             setDiagonalMenor(operation.detalles.diagonalMenor);
@@ -489,7 +479,6 @@ const Geometria = () => {
             break;
           case 'elipse':
             setFigure('elipse');
-            console.log('Elipse: ----------------------------------------------------------------');
             setEjeMayor(operation.detalles.ejeMayor);
             setEjeMenor(operation.detalles.ejeMenor);
             setDistFocal(operation.detalles.distFocal);
@@ -501,7 +490,6 @@ const Geometria = () => {
             break;
           case 'esfera':
             setFigure('esfera');
-            console.log('Esfera: ----------------------------------------------------------------');
             setRadio(operation.detalles.radio);
             setDiametro(operation.detalles.diametro);
             setArea(operation.detalles.area);
@@ -511,7 +499,6 @@ const Geometria = () => {
             break;
           case 'piramide':
             setFigure('piramide');
-            console.log('Pirámide: ----------------------------------------------------------------');
             setLado(operation.detalles.lado);
             setAltura(operation.detalles.altura);
             setApotema(operation.detalles.apotema);
@@ -521,7 +508,6 @@ const Geometria = () => {
             break;
           case 'cubo':
             setFigure('cubo');
-            console.log('Cubo: ----------------------------------------------------------------');
             setLado(operation.detalles.lado);
             setArea(operation.detalles.area);
             setVolumen(operation.detalles.volumen);
@@ -529,7 +515,6 @@ const Geometria = () => {
             break;
           case 'cilindro':
             setFigure('cilindro');
-            console.log('Cilindro: ----------------------------------------------------------------');
             handleOperation(`dibuja un ${operation.tipo}`);
             setRadio(operation.detalles.radio);
             setDiametro(operation.detalles.diametro);
@@ -539,7 +524,6 @@ const Geometria = () => {
             break;
           case 'cono':
             setFigure('cono');
-            console.log('Cono: ----------------------------------------------------------------');
             setRadio(operation.detalles.radio);
             setArea(operation.detalles.area);
             setVolumen(operation.detalles.volumen);
@@ -549,7 +533,6 @@ const Geometria = () => {
             break;
           case 'angulo':
             setFigure('angulo');
-            console.log('Ángulo: ----------------------------------------------------------------');
             setAngleDegrees(operation.detalles.angleDegrees);
             handleOperation(`dibuja un ${operation.tipo}`);
             break;
@@ -564,14 +547,12 @@ const Geometria = () => {
     const fetchOperations = async () => {
       const ops = await getAllOperations();
       setOperations(ops);
-      console.log('Operaciones almacenadas:', ops);
     };
 
     fetchOperations();
   }, []);
 
   const handleSave = async () => {
-    console.log("Entra", figure, lado, base, altura, area, perimetro, radio, diametro, diagonalMayor, diagonalMenor, ejeMayor, ejeMenor, distFocal, volumen, circunferencia, apotema);
   
     try {
       let elementData = null;
@@ -580,7 +561,6 @@ const Geometria = () => {
       const newId = await generateUniqueId();
   
       // Verifica el valor de figure
-      console.log("Valor de figure:", figure);
   
       switch (figure.trim().toLowerCase()) {
         case 'cuadrado':
@@ -702,8 +682,6 @@ const Geometria = () => {
       }
   
       // Verifica el valor de elementData
-      console.log("Valor de elementData:", elementData);
-  
       // Si se creó elementData, guarda la figura geométrica
       if (elementData) {
         // Guardar la figura geométrica con la imagen capturada
@@ -712,7 +690,6 @@ const Geometria = () => {
   
         const elements = await getAllOperations();
         setOperations(elements);
-        console.log('Figuras geométricas actualizadas:', elements);
         navigation.navigate('Home');
       }
     } catch (error) {
@@ -722,7 +699,6 @@ const Geometria = () => {
 
 
   const renderIcon = () => {
-    console.log("Figure: " + figure);
     switch (figure) {
       case 'cuadrado':
         return (
@@ -945,7 +921,7 @@ const Geometria = () => {
             </View>
           );
       case 'angulo':
-        console.log("Ángulo: " + angleDegrees);
+ 
         return drawAngle(angleDegrees); // Usa la función drawAngle
       default:
         return null;

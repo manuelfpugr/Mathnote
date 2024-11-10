@@ -1,5 +1,13 @@
 
  const regexUtils = {
+
+    // Regular expressionns for geometric figures
+    geometricFigureRegex: /\b(dibuj(a|o|ar)?\s*(un|una)?\s*(cuadrado|triangulo|rectangulo|circulo|pentagono|hexagono|rombo|paralelogramo|elipse))\b/i,
+    geometric3DFigureRegex: /\b(dibuj(a|o|ar)?\s*(un|una)?\s*(esfera|cubo|cilindro|cono|piramide|prisma hexagonal|prisma rectangular|tetraedro|octaedro))\b/i,
+    angleRegex: /\b(?:dibuja\s+)?un\s*angulo\s*de\s*(\d+)\s*grados?\b/i,
+    dimensionRegex : /\b(volumen|apotema|lado|altura|base|area|perimetro|distancia focal|eje mayor|eje menor|diagonal mayor|diagonal menor|circunferencia|diametro|radio)\s*igual\s*a\s*(\d+)\b/i,
+
+
     // Regular expressions for operations
     operationRegex: /(\d+)\s*(menos|más|\+|\-|\x|por)\s*(\d+(\s*(menos|más|\+|\-|\x|por)\s*\d+)*)/,
     resultMatchRegex: /^\s*([\d\smenos-]+)\s*(?:igual\s*a|=|,|\s)?\s*(\d+)\s*$/i,
@@ -18,7 +26,36 @@
     procedimientoRestaRegex: /\b(\d+|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(menos|-)\s*(\d+|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\s*(igual\s*a|es|son)?\s*,?\s*(\d+|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\b/gi,    
     procedimientoResta2Regex: /^\s*(zero|cero|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|0|1|2|3|4|5|6|7|8|9)[.,!?]?\s*$/i,
     comaRegex: /\b(?:coma|añado una coma|pongo una coma|añado una coma después del \d+)\b/gi,
+    resultRegex: /(\d+\s*(?:más|menos|\+|\-)\s*)+\d+\s*igual\s*a\s*(\d+)/i,
 
+    guardarOperacionRegex: /\b(quiero\s+guardar\s+la\s+operación|guardar\s+la\s+operación|guardar)\b/i,
+
+    matchDimension(text) {
+        return match = text.match(this.dimensionRegex);
+
+    },
+
+    matchAngle(text) {
+        const match = text.match(this.angleRegex);
+        if (match) {
+          return match[1];
+      }
+    },
+
+    matchGeometricFigure(text) {
+        return text.match(this.geometricFigureRegex);
+    },
+
+    matchGeometric3DFigure(text) {
+        return text.match(this.geometric3DFigureRegex);
+    },
+    
+    matchGuardarOperacion(text) {
+        return text.match(this.guardarOperacionRegex);
+    },
+    matchMultipleSum(text){
+        return text.match(this.resultRegex);
+    },
     // Methods to use the regular expressions
     matchMultipleNumbersAndOperators(text) {
         return text.match(this.operationRegex);

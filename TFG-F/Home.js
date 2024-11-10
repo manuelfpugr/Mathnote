@@ -281,7 +281,6 @@ const Home = () => {
     "abrir actividades guardadas"
     ];
     const textoLimpio = limpiarTexto(text);
-    console.log("Texto:", textoLimpio);
     if (validAritmetica.includes(textoLimpio.toLowerCase())) {
       navigation.navigate('Aritmetica');
     } else if (validGeometria.includes(textoLimpio.toLowerCase())) {
