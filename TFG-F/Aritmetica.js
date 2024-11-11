@@ -102,7 +102,7 @@ const Aritmetica = () => {
           },
         });
         setRecording(recording);
-        setMessage('Recording...');
+        setMessage('Grabando...');
       } else {
         setMessage('Permission to access microphone is required!');
       }
@@ -113,7 +113,7 @@ const Aritmetica = () => {
 
   const stopRecording = async () => {
     setRecording(undefined);
-    setMessage('Recording stopped');
+
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
     console.log('Recording URI:', uri);

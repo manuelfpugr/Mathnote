@@ -61,7 +61,6 @@ const Home = () => {
 
   const stopRecording = async () => {
     setRecording(undefined);
-    setMessage('Recording stopped');
     await recording.stopAndUnloadAsync();
     const uri = recording.getURI();
     console.log('Recording URI:', uri);
